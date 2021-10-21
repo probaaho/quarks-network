@@ -1,6 +1,6 @@
 # quarks network
 This project aims to eradicate the shortcomings of existing secure private messaging. Quarks 
-is an open network for secure, private and decentralized communication. Quarks network ensures
+is an open network for secure, private and distributed communication. Quarks network ensures
 - Non-repudiation
 - User's control over privacy
 - User's control over who will host their data
@@ -18,3 +18,8 @@ is an open network for secure, private and decentralized communication. Quarks n
 - message crud
 - adding organization to the channel
 - adding member to the channel
+
+
+
+### getting started
+- setup executables in node-poc/bin
