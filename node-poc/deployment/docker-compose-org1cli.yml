@@ -28,6 +28,9 @@ services:
 #      - $GOPATH/src/github.com/hyperledger/fabric/:/opt/gopath/src/github.com/hyperledger/fabric/
 #      - ../go/src/github.com/hyperledger/fabric/:/opt/gopath/src/github.com/hyperledger/fabric/
       - ../go/src/github.com/hyperledger/fabric-chaincode-go/:/opt/gopath/src/github.com/hyperledger/fabric-chaincode-go/
+      - ../go/src/github.com/hyperledger/fabric-protos-go/:/opt/gopath/src/github.com/hyperledger/fabric-protos-go/
+      - ../go/src/github.com/golang/protobuf/:/opt/gopath/src/github.com/golang/protobuf/
+      - ../go/src/google.golang.org/protobuf/:/opt/gopath/src/google.golang.org/protobuf/
       - ../crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
     networks:
       - behave
