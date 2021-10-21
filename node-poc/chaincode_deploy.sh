@@ -19,6 +19,14 @@ then
     echo
     echo "######## Chaincode Install ###########"
 
+    docker exec cli1 rm -rf /opt/gopath/src/github.com/chaincode
+    docker exec cli2 rm -rf /opt/gopath/src/github.com/chaincode
+    docker exec cli3 rm -rf /opt/gopath/src/github.com/chaincode
+
+    docker cp chaincode cli1:/opt/gopath/src/github.com/chaincode
+    docker cp chaincode cli2:/opt/gopath/src/github.com/chaincode
+    docker cp chaincode cli3:/opt/gopath/src/github.com/chaincode
+
     docker exec cli1 peer chaincode install -n $cc_name -p github.com/chaincode -v v$cc_version
     docker exec cli2 peer chaincode install -n $cc_name -p github.com/chaincode -v v$cc_version
     docker exec cli3 peer chaincode install -n $cc_name -p github.com/chaincode -v v$cc_version
