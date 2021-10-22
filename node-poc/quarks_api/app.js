@@ -32,6 +32,7 @@ const org3Connection = JSON.parse(org3ConnectionJSON);
 
 
 const FabricClient = require('./fabricClient');
+const {addAffiliationCA} = require("./fabricClient");
 
 appOrg1.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -98,15 +99,13 @@ appOrg3.post('/enrollAdmin', async function (req, res) {
 });
 
 async function enrollAdminOrg(org) {
-    let orgConnectionPath = path.resolve(__dirname, env[org]['connectionFile']);
-    let orgConnectionJSON = fs.readFileSync(orgConnectionPath, 'utf8');
-    let orgConnection = JSON.parse(orgConnectionJSON);
+    let orgConnection = await getOrgConnection(org)
 
     let caUrl = orgConnection.certificateAuthorities[env[org].caUrl].url
     let walletPathStr = env[org].walletPath
     let adminUserName = env[org].adminUserName
     let adminSecret = env[org].adminSecret
-    let mspId = env[org]
+    let mspId = env[org].mspId
 
     return await FabricClient.enrollAdmin(FabricCAServices,
         FileSystemWallet,
@@ -118,6 +117,123 @@ async function enrollAdminOrg(org) {
         adminSecret,
         mspId);
 }
+
+
+////// register user //////////
+appOrg1.post('/registerUser', async function (req, res) {
+    let registerUserReq = req.body;
+    let result = false
+    if (!isEmpty(registerUserReq["username"])) {
+        result = await registerUserOrg("org1", registerUserReq["username"])
+    }
+
+    res.json(result);
+    return res;
+});
+
+
+appOrg2.post('/registerUser', async function (req, res) {
+    let registerUserReq = req.body;
+    let result = false
+    if (!isEmpty(registerUserReq["username"])) {
+        result = await registerUserOrg("org2", registerUserReq["username"])
+    }
+
+    res.json(result);
+    return res;
+});
+
+
+appOrg3.post('/registerUser', async function (req, res) {
+    let registerUserReq = req.body;
+    let result = false
+    if (!isEmpty(registerUserReq["username"])) {
+        result = await registerUserOrg("org3", registerUserReq["username"])
+    }
+
+    res.json(result);
+    return res;
+});
+
+
+async function registerUserOrg(org, userName) {
+    let orgConnection = await getOrgConnection(org)
+
+    let caUrl = orgConnection.certificateAuthorities[env[org].caUrl].url
+    let walletPathStr = env[org].walletPath
+    let adminUserName = env[org].adminUserName
+    let mspId = env[org].mspId
+    let departmentName = env[org].departmentName
+
+    return await FabricClient.registerUser(FileSystemWallet,
+        X509WalletMixin,
+        path,
+        Gateway,
+        orgConnection,
+        caUrl,
+        walletPathStr,
+        adminUserName,
+        mspId,
+        userName,
+        departmentName);
+}
+
+
+//// add affiliation /////
+appOrg1.post('/addAffiliation', async function (req, res) {
+    let addAffiliationReq = req.body;
+    let result = false
+    if (!isEmpty(addAffiliationReq["department"])) {
+        result = await addAffiliationOrg("org1", addAffiliationReq["department"])
+    }
+
+    res.json(result);
+    return res;
+});
+
+appOrg2.post('/addAffiliation', async function (req, res) {
+    let addAffiliationReq = req.body;
+    let result = false
+    if (!isEmpty(addAffiliationReq["department"])) {
+        result = await addAffiliationOrg("org2", addAffiliationReq["department"])
+    }
+
+    res.json(result);
+    return res;
+});
+
+appOrg3.post('/addAffiliation', async function (req, res) {
+    let addAffiliationReq = req.body;
+    let result = false
+    if (!isEmpty(addAffiliationReq["department"])) {
+        result = await addAffiliationOrg("org3", addAffiliationReq["department"])
+    }
+
+    res.json(result);
+    return res;
+});
+
+
+async function addAffiliationOrg(org, department) {
+
+    let orgConnection = await getOrgConnection(org)
+
+    let walletPathStr = env[org].walletPath
+    let adminUserName = env[org].adminUserName
+    let adminSecret = env[org].adminSecret
+
+
+    return await FabricClient.addAffiliationCA(FileSystemWallet,
+        path,
+        orgConnection,
+        walletPathStr,
+        adminUserName,
+        adminSecret,
+        org,
+        department
+    );
+}
+
 
 // /////// MEDMAN ///////////////////
 //
@@ -477,7 +593,15 @@ async function enrollAdminOrg(org) {
 
 
 /////// functions
+function isEmpty(str) {
+    return (!str || str.length === 0);
+}
 
+async function getOrgConnection(org) {
+    let orgConnectionPath = path.resolve(__dirname, env[org]['connectionFile']);
+    let orgConnectionJSON = fs.readFileSync(orgConnectionPath, 'utf8');
+    return JSON.parse(orgConnectionJSON)
+}
 
 async function getContract(org, channel) {
     try {
@@ -511,9 +635,7 @@ async function getContract(org, channel) {
         const network = await gateway.getNetwork(env[org].channels[channel]);
 
         // Get the contract from the network.
-        const contract = network.getContract(env[org].contractName);
-
-        return contract;
+        return network.getContract(env[org].contractName);
         // // Evaluate the specified transaction.
         // // queryCar transaction - requires 1 argument, ex: ('queryCar', 'CAR4')
         // // queryAllCars transaction - requires no arguments, ex: ('queryAllCars')

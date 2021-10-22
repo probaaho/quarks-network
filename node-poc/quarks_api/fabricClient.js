@@ -1,26 +1,28 @@
+const {Gateway, X509WalletMixin} = require("fabric-network");
+
 async function enrollAdmin(FabricCAServices, FileSystemWallet, X509WalletMixin, path, caUrl, walletPathStr, adminUserName, adminSecret, mspId) {
     try {
 
         // Create a new CA client for interacting with the CA.
-        const ca = new FabricCAServices(caUrl);
+        let ca = new FabricCAServices(caUrl);
 
         // Create a new file system based wallet for managing identities.
-        const walletPath = path.join(process.cwd(), walletPathStr);
-        const wallet = new FileSystemWallet(walletPath);
+        let walletPath = path.join(process.cwd(), walletPathStr);
+        let wallet = new FileSystemWallet(walletPath);
 
         // Check to see if we've already enrolled the admin user.
-        const adminExists = await wallet.exists(adminUserName);
+        let adminExists = await wallet.exists(adminUserName);
         if (adminExists) {
             console.log(`An identity for the admin user ${adminUserName} already exists in the wallet`);
             return false;
         }
 
         // Enroll the admin user, and import the new identity into the wallet.
-        const enrollment = await ca.enroll({
+        let enrollment = await ca.enroll({
             enrollmentID: adminUserName,
             enrollmentSecret: adminSecret
         });
-        const identity = X509WalletMixin.createIdentity(
+        let identity = X509WalletMixin.createIdentity(
             mspId,
             enrollment.certificate,
             enrollment.key.toBytes()
@@ -36,8 +38,112 @@ async function enrollAdmin(FabricCAServices, FileSystemWallet, X509WalletMixin, 
     }
 }
 
+async function registerUser(FileSystemWallet, X509WalletMixin, path, Gateway, orgConnection, caUrl, walletPathStr, adminUserName, mspId, userName, departmentName) {
+    try {
+
+        // Create a new file system based wallet for managing identities.
+        let walletPath = path.join(process.cwd(), walletPathStr);
+        let wallet = new FileSystemWallet(walletPath);
+
+        // Check to see if we've already enrolled the user.
+        let userExists = await wallet.exists(userName);
+        if (userExists) {
+            console.log(`An identity for the user "${userName}" already exists in the wallet`);
+            return;
+        }
+
+        // Check to see if we've already enrolled the admin user.
+        let adminExists = await wallet.exists(adminUserName);
+        if (!adminExists) {
+            console.log(`An identity for the admin user "${adminUserName}" does not exist in the wallet`);
+            return;
+        }
+
+        // Create a new gateway for connecting to our peer node.
+        let gateway = new Gateway();
+        await gateway.connect(orgConnection, {
+            wallet, identity: adminUserName,
+            discovery: {enabled: false}
+        });
+
+        // Get the CA client object from the gateway for interacting with the CA.
+        let ca = gateway.getClient().getCertificateAuthority();
+        let adminIdentity = gateway.getCurrentIdentity();
+
+        // Register the user, enroll the user, and import the new identity into the wallet.
+        let secret = await ca.register({
+            affiliation: departmentName,
+            enrollmentID: userName,
+            role: 'client'
+        }, adminIdentity);
+
+        let enrollment = await ca.enroll({enrollmentID: userName, enrollmentSecret: secret});
+        const userIdentity = X509WalletMixin.createIdentity(mspId, enrollment.certificate, enrollment.key.toBytes());
+        await wallet.import(userName, userIdentity);
+        console.log(`Successfully registered and enrolled admin user "${userName}" and imported it into the wallet`);
+
+        return true;
+
+    } catch (error) {
+        console.error(`Failed to register user "${userName}": ${error}`);
+        return false;
+    }
+}
+
+async function addAffiliationCA(FileSystemWallet, path, orgConnection, walletPathStr, adminUserName, adminSecret, orgName, departmentName) {
+
+    try {
+        let affiliation = orgName + "." + departmentName
+
+        // Create a new file system based wallet for managing identities.
+        let walletPath = path.join(process.cwd(), walletPathStr);
+        let wallet = new FileSystemWallet(walletPath);
+
+
+        // Check to see if we've already enrolled the admin user.
+        const adminExists = await wallet.exists(adminUserName);
+        if (!adminExists) {
+            console.log(`An identity for the admin user "${adminUserName}" does not exist in the wallet`);
+            return;
+        }
+
+        // Create a new gateway for connecting to our peer node.
+        const gateway = new Gateway();
+        await gateway.connect(orgConnection, {wallet, identity: adminUserName, discovery: {enabled: false}});
+
+        let client = gateway.getClient();
+        let adminUserObj = await client.setUserContext({
+            username: adminUserName,
+            password: adminSecret
+        });
+
+        let caClient = client.getCertificateAuthority();
+        let affiliationService = caClient.newAffiliationService();
+
+        let registeredAffiliations = await affiliationService.getAll(adminUserObj);
+        if (!registeredAffiliations.result.affiliations.some(
+            x => x.name === orgName.toLowerCase())) {
+            await affiliationService.create({
+                name: affiliation,
+                force: true
+            }, adminUserObj);
+        }
+
+        console.log(`Successfully affiliated "${orgName}" "${departmentName}" in CA`);
+
+        return true;
+
+    } catch (error) {
+        console.error(`Failed to add affiliation "${orgName}" "${departmentName}": ${error}`);
+        return false;
+    }
+
+}
+
 
 module.exports = {
-    enrollAdmin
+    enrollAdmin,
+    registerUser,
+    addAffiliationCA
 }
 
