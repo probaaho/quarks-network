@@ -55,9 +55,7 @@ async function main(org) {
     }
 }
 
-const org = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'org.json'), 'utf8'));
 
-//console.log(org.name)
-main(org.name);
+main("nbr");
 
 //test("nbr");

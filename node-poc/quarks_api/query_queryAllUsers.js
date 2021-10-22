@@ -8,6 +8,8 @@ const { FileSystemWallet, Gateway } = require('fabric-network');
 const fs = require('fs');
 const path = require('path');
 
+const userConfig = require('./config');
+
 const ccpPath = path.resolve(__dirname,'connection.json');
 const ccpJSON = fs.readFileSync(ccpPath, 'utf8');
 const ccp = JSON.parse(ccpJSON);
@@ -21,22 +23,22 @@ async function main() {
         console.log(`Wallet path: ${walletPath}`);
 
         // Check to see if we've already enrolled the user.
-        const userExists = await wallet.exists('user1');
+        const userExists = await wallet.exists(userConfig.getAdminUserName());
         if (!userExists) {
-            console.log('An identity for the user "user1" does not exist in the wallet');
-            console.log('Run the registerUser.js application before retrying');
+            console.log(`An identity for the user "${userConfig.getAdminUserName()}" does not exist in the wallet`);
+            console.log('Run the registerUser.js application before retrying'); //TODO:Check this line
             return;
         }
 
         // Create a new gateway for connecting to our peer node.
         const gateway = new Gateway();
-        await gateway.connect(ccp, { wallet, identity: 'user1', discovery: { enabled: false } });
+        await gateway.connect(ccp, { wallet, identity: userConfig.getAdminUserName(), discovery: { enabled: false } });
 
         // Get the network (channel) our contract is deployed to.
-        const network = await gateway.getNetwork('mychannel');
+        const network = await gateway.getNetwork(userConfig.getChannelName());
 
         // Get the contract from the network.
-        const contract = network.getContract('mycc');
+        const contract = network.getContract(userConfig.getContractName());
 
         // Evaluate the specified transaction.
         // queryCar transaction - requires 1 argument, ex: ('queryCar', 'CAR4')

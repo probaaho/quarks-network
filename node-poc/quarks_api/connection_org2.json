@@ -1,71 +1,70 @@
 {
-    "name": "behave",
-    "version": "1.0.0",
-    "client": {
-        "organization": "Org2",
-        "connection": {
-            "timeout": {
-                "peer": {
-                    "endorser": "3000"
-                },
-                "orderer": "3000"
-            }
-        }
-    },
-    "channels": {
-        "channel-all": {
-            "orderers": [
-                "orderer0.example.com",
-                "orderer1.example.com",
-                "orderer2.example.com"
-            ],
-            "peers": {
-                "peer0.org2.example.com": {},
-                "peer1.org2.example.com": {},
-                "peer2.org2.example.com": {}
-            }
-        }
-    },
-    "organizations": {
-        "Org2": {
-            "mspid": "Org2MSP",
-            "peers": [
-                "peer0.org2.example.com",
-                "peer1.org2.example.com",
-                "peer2.org2.example.com"
-            ],
-            "certificateAuthorities": [
-                "ca.org2.example.com"
-            ]
-        }
-    },
-    "orderers": {
-        "orderer0.example.com": {
-            "url": "grpc://172.31.8.37:7050"
+  "name": "behave",
+  "version": "1.0.0",
+  "client": {
+    "organization": "Org2",
+    "connection": {
+      "timeout": {
+        "peer": {
+          "endorser": "3000"
         },
-        "orderer1.example.com": {
-            "url": "grpc://172.31.8.37:8050"
-        },
-        "orderer2.example.com": {
-            "url": "grpc://172.31.8.37:9050"
-        }
-    },
-    "peers": {
-        "peer0.org2.example.com": {
-            "url": "grpc://172.31.44.180:7051"
-        },
-        "peer1.org2.example.com": {
-            "url": "grpc://172.31.44.180:8051"
-        },
-        "peer2.org2.example.com": {
-            "url": "grpc://172.31.44.180:9051"
-        }
-    },
-    "certificateAuthorities": {
-        "ca.org2.example.com": {
-            "url": "http://172.31.8.37:8054",
-            "caName": "ca.org2.example.com"
-        }
-
+        "orderer": "3000"
+      }
     }
+  },
+  "channels": {
+    "channel-123": {
+      "orderers": [
+        "orderer0.example.com",
+        "orderer1.example.com",
+        "orderer2.example.com"
+      ],
+      "peers": {
+        "peer0.org2.example.com": {}
+      }
+    },
+    "channel-23": {
+      "orderers": [
+        "orderer0.example.com",
+        "orderer1.example.com",
+        "orderer2.example.com"
+      ],
+      "peers": {
+        "peer0.org2.example.com": {}
+      }
+    }
+  },
+  "organizations": {
+    "Org2": {
+      "mspid": "Org2MSP",
+      "peers": [
+        "peer0.org2.example.com"
+      ],
+      "certificateAuthorities": [
+        "ca.org2.example.com"
+      ]
+    }
+  },
+  "orderers": {
+    "orderer0.example.com": {
+      "url": "grpc://quark.org1.com:7050"
+    },
+    "orderer1.example.com": {
+      "url": "grpc://quark.org2.com:8050"
+    },
+    "orderer2.example.com": {
+      "url": "grpc://quark.org3.com:9050"
+    }
+  },
+  "peers": {
+    "peer0.org2.example.com": {
+      "url": "grpc://quark.org2.com:8051"
+    }
+  },
+  "certificateAuthorities": {
+    "ca.org2.example.com": {
+      "url": "http://quark.org2.com:8054",
+      "caName": "ca.org2.example.com"
+    }
+  }
 }
