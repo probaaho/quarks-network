@@ -37,9 +37,9 @@ then
     if [ $cc_action = init ]
     then
         echo "### INIT ###"
-        docker exec cli1 peer chaincode instantiate -o orderer0.example.com:7050 -C channel-123 -n $cc_name github.com/chaincode -v v$cc_version -c '{"Args": []}'
-        docker exec cli1 peer chaincode instantiate -o orderer0.example.com:7050 -C channel-1 -n $cc_name github.com/chaincode -v v$cc_version -c '{"Args": []}'
-        docker exec cli2 peer chaincode instantiate -o orderer1.example.com:7050 -C channel-23 -n $cc_name github.com/chaincode -v v$cc_version -c '{"Args": []}'
+        docker exec cli1 peer chaincode instantiate -o orderer0.example.com:7050 -C channel-123 -n $cc_name github.com/chaincode -v v$cc_version -c '{"Args": ["initLedger"]}'
+        docker exec cli1 peer chaincode instantiate -o orderer0.example.com:7050 -C channel-1 -n $cc_name github.com/chaincode -v v$cc_version -c '{"Args": ["initLedger"]}'
+        docker exec cli2 peer chaincode instantiate -o orderer1.example.com:7050 -C channel-23 -n $cc_name github.com/chaincode -v v$cc_version -c '{"Args": ["initLedger"]}'
 
 
 
@@ -48,8 +48,8 @@ then
     elif [ $cc_action = upgrade ]
     then
         echo "### UPGRADE ###"
-        docker exec cli1 peer chaincode upgrade -o orderer0.example.com:7050 -C channel-123 -n $cc_name github.com/chaincode -v v$cc_version -c '{\"Args\": [\"updateCC\"]}'
-        docker exec cli1 peer chaincode upgrade -o orderer0.example.com:7050 -C channel-1 -n $cc_name github.com/chaincode -v v$cc_version -c '{\"Args\": [\"updateCC\"]}'
-        docker exec cli2 peer chaincode upgrade -o orderer1.example.com:7050 -C channel-23 -n $cc_name github.com/chaincode -v v$cc_version -c '{\"Args\": [\"updateCC\"]}'
+        docker exec cli1 peer chaincode upgrade -o orderer0.example.com:7050 -C channel-123 -n $cc_name github.com/chaincode -v v$cc_version -c '{"Args": ["updateCC"]}'
+        docker exec cli1 peer chaincode upgrade -o orderer0.example.com:7050 -C channel-1 -n $cc_name github.com/chaincode -v v$cc_version -c '{"Args": ["updateCC"]}'
+        docker exec cli2 peer chaincode upgrade -o orderer1.example.com:7050 -C channel-23 -n $cc_name github.com/chaincode -v v$cc_version -c '{"Args": ["updateCC"]}'
     fi
 fi

@@ -1,41 +1,49 @@
 /*
-Project: AlphaID
-
+Project: Quarks
 */
 
 package main
 
-/* Imports
- * 4 utility libraries for formatting, handling bytes, reading and writing JSON, and string manipulation
- * 2 specific Hyperledger Fabric specific libraries for Smart Contracts
- */
-
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strconv"
+	"time"
 
+	"github.com/hyperledger/fabric-chaincode-go/pkg/cid"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	"github.com/hyperledger/fabric/protos/peer"
-	"github.com/hyperledger/fabric-chaincode-go/pkg/cid"
 )
 
-// Define the Smart Contract structure
+// SmartContract Define the Smart Contract structure
 type SmartContract struct {
 }
 
-// Define the car structure, with 4 properties.  Structure tags are used by encoding/json library
-type User struct {
-	Name         string `json:"name"`
-	Email        string `json:"email"`
-	Role         string `json:"role"`
-	PasswordHash string `json:"password_hash"`
-	Dept         string `json:"dept"`
+// Message Define the data structure, with properties.  Structure tags are used by encoding/json library
+type Message struct {
+	Email string `json:"email"`
+	Text  string `json:"text"`
 }
 
+type MessageResponse struct {
+	Timestamp string `json:"timestamp"`
+	Email     string `json:"email"`
+	Text      string `json:"text"`
+}
+
+type Test struct { /// nevermind this
+	Id    string `json:"id"`
+	MspId string `json:"mspid"`
+	Email string `json:"email"`
+}
+
+const CC_INIT_TIMESTAMP_KEY = `CC_INIT_TIMESTAMP`
+const CC_DEFAULT_INIT_TIMESTAMP = `943920000000000` //Tuesday, 30 November 1999 00:00:00
+
 /*
- * The Init method is called when the Smart Contract "fabcar" is instantiated by the blockchain network
+ * The Init method is called when the Smart Contract is instantiated by the blockchain network
  * Best practice is to have any Ledger initialization in separate function -- see initLedger()
  */
 
@@ -47,27 +55,23 @@ func (s *SmartContract) updateCC(stub shim.ChaincodeStubInterface) peer.Response
 	return shim.Success(nil)
 }
 
-/*
- * The Invoke method is called as a result of an application request to run the Smart Contract "fabcar"
- * The calling application program has also specified the particular smart contract function to be called, with arguments
- */
+//Invoke method is called as a result of an application request to run the Smart Contract
+//The calling application program has also specified the particular smart contract function to be called, with arguments
 func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) peer.Response {
 
 	// Retrieve the requested Smart Contract function and arguments
 	function, args := APIstub.GetFunctionAndParameters()
 	// Route to the appropriate handler function to interact with the ledger appropriately
-	if function == "queryUser" {
-		return s.queryUser(APIstub, args)
+	if function == "queryMessages" {
+		return s.queryMessages(APIstub, args)
+	} else if function == "addMessage" {
+		return s.addMessage(APIstub, args)
 	} else if function == "initLedger" {
 		return s.initLedger(APIstub)
-	} else if function == "createUser" {
-		return s.createUser(APIstub, args)
-	} else if function == "queryAllUsers" {
-		return s.queryAllUsers(APIstub)
-	} else if function == "totalUsers" {
-		return s.totalUsers(APIstub)
 	} else if function == "queryTest" {
 		return s.queryTest(APIstub)
+	} else if function == "invokeTest" {
+		return s.invokeTest(APIstub, args)
 	} else if function == "updateCC" {
 		return s.updateCC(APIstub)
 	}
@@ -75,67 +79,129 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) peer.Respons
 	return shim.Error("Invalid Smart Contract function name.")
 }
 
-// invoke
-
+/////////////////////////////////// INVOKE ////////////////////////////////////
 func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) peer.Response {
-	users := []User{
-		User{Name: "Syed Md Hasnayeen", Email: "rumman@gmail.com", Role: "student", Dept: "CSE", PasswordHash: "f498cc540f98e18bec3bb51e03935b2cac0ea3b85cd0762226a5f28924dda3e5"},                //rumman1234
-		User{Name: "Mirza Kamrul Bashar Shuhan", Email: "shuhan.mirza@gmail.com", Role: "student", Dept: "CSE", PasswordHash: "2860087d2a44a6b61ec5a829a8582bdf0580d270d6d44f05493cd245f5e053ca"}, //shuhan1234
-		User{Name: "Rupasree Dey", Email: "rup@gmail.com", Role: "student", Dept: "CSE", PasswordHash: "dcf4ff0363ca39669e251360710f72ef66bfcfef2402c72735729fbfe06bc029"},                        //rup1234
-		User{Name: "Md Sadek Ferdous Ripul", Email: "ripul.bd@gmail.com", Role: "faculty", Dept: "CSE", PasswordHash: "cc0c773e876f996d9dae9e56921a56d867e66ad18118f41ff48ddbc28c4fa725"},         //ripul1234
-		User{Name: "Muntasir Mahdi", Email: "muntasir@gmail.com", Role: "student", Dept: "EEE", PasswordHash: "1ef8ded450bc1297a35df954e2e173782990b9dcf5a7fe41f291341b19931caa"},                 //muntasir1234
-		User{Name: "Nuren Zabin Shuchi", Email: "shuchi@gmail.com", Role: "faculty", Dept: "EEE", PasswordHash: "12a15c8e2903a6a1844e73a455ae53e84be32c6fee3cbe331e75796024e5358d"},               //shuchi1234
+	err := APIstub.PutState(CC_INIT_TIMESTAMP_KEY, []byte(getCurrentTimestamp()))
+	if err != nil {
+		return shim.Error(err.Error())
 	}
-
-	i := 0
-	for i < len(users) {
-		fmt.Println("i is ", i)
-		userAsBytes, _ := json.Marshal(users[i])
-		APIstub.PutState("USER_"+users[i].Email, userAsBytes)
-		fmt.Println("Added", users[i])
-		i = i + 1
-	}
-
 	return shim.Success(nil)
 }
 
-func (s *SmartContract) createUser(APIstub shim.ChaincodeStubInterface, args []string) peer.Response {
+func (s *SmartContract) addMessage(APIstub shim.ChaincodeStubInterface, args []string) peer.Response {
 
-	if len(args) != 5 {
-		return shim.Error("Incorrect number of arguments. Expecting 5")
-	}
-
-	var user = User{Name: args[0], Email: args[1], Role: args[2], Dept: args[3], PasswordHash: args[4]}
-
-	userAsBytes, _ := json.Marshal(user)
-	tempKey := "USER_"
-	tempKey += user.Email //countElements(APIstub, "USER_")
-	APIstub.PutState(tempKey, userAsBytes)
-
-	return shim.Success(nil)
-}
-
-// query
-
-func (s *SmartContract) queryUser(APIstub shim.ChaincodeStubInterface, args []string) peer.Response {
-
+	//text
 	if len(args) != 1 {
 		return shim.Error("Incorrect number of arguments. Expecting 1")
 	}
+	text := args[0]
+	email, err := getCreatorEnrollmentId(APIstub)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	timestamp := getCurrentTimestamp()
 
-	userAsBytes, _ := APIstub.GetState("USER_" + args[0])
+	var message = Message{Text: text, Email: email}
 
-	return shim.Success(userAsBytes)
+	messageAsBytes, _ := json.Marshal(message)
+	err = APIstub.PutState(timestamp, messageAsBytes)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	var messageResponse = MessageResponse{Timestamp: timestamp, Email: email, Text: text}
+	messageAsBytes, _ = json.Marshal(messageResponse)
+
+	return shim.Success(messageAsBytes)
 }
 
-func (s *SmartContract) queryAllUsers(APIstub shim.ChaincodeStubInterface) peer.Response {
-	return shim.Success([]byte(s.getAllElement(APIstub, "USER_")))
+func (s *SmartContract) invokeTest(APIstub shim.ChaincodeStubInterface, args []string) peer.Response {
+	id, _ := cid.GetID(APIstub)
+	mspid, _ := cid.GetMSPID(APIstub)
+	email := `email`
+
+	// [{"name":"hf.IntermediateCA","value":"1"},{"name":"hf.GenCRL","value":"1"},{"name":"hf.Registrar.Attributes","value":"*"},{"name":"hf.AffiliationMgr","value":"1"},{"name":"hf.Registrar.Roles","value":"*"},{"name":"hf.Registrar.DelegateRoles","value":"*"},{"name":"hf.Revoker","value":"1"}]
+	// [{"name":"hf.EnrollmentID","value":"shuhan.mirza@gmail.com","ecert":true},{"name":"hf.Type","value":"client","ecert":true},{"name":"hf.Affiliation","value":"org1.department1","ecert":true}]
+
+	val, ok, err := cid.GetAttributeValue(APIstub, "hf.EnrollmentID")
+	if err != nil {
+		fmt.Println(err)
+		email = `err`
+		// There was an error trying to retrieve the attribute
+	}
+	if !ok {
+		email = `not ok`
+		// The client identity does not possess the attribute
+	}
+
+	email = val
+	creator, err1 := APIstub.GetCreator()
+	if err1 != nil {
+		fmt.Println(err1)
+		email = `err1`
+		// There was an error trying to retrieve the attribute
+	}
+	email = string(creator)
+	// Do something with the value of 'val'
+
+	var testobj = Test{Id: id, MspId: mspid, Email: email}
+
+	testAsBytes, _ := json.Marshal(testobj)
+
+	return shim.Success(testAsBytes)
 }
 
-func (s *SmartContract) totalUsers(APIstub shim.ChaincodeStubInterface) peer.Response {
-	ret := countElements(APIstub, "USER_")
+///////////////////////////////////// QUERY ///////////////////////////////
+func (s *SmartContract) queryMessages(APIstub shim.ChaincodeStubInterface, args []string) peer.Response {
+	var startTime = ``
+	initTimeStampBytes, err := APIstub.GetState(CC_INIT_TIMESTAMP_KEY)
+	if err != nil {
+		startTime = CC_DEFAULT_INIT_TIMESTAMP
+	}
+	startTime = string(initTimeStampBytes)
+	endTime := getCurrentTimestamp()
+
+	resultsIterator, err := APIstub.GetStateByRange(startTime, endTime)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	defer func(resultsIterator shim.StateQueryIteratorInterface) {
+		err := resultsIterator.Close()
+		if err != nil {
+			return
+		}
+	}(resultsIterator)
+
+	// buffer is a JSON array containing QueryResults
 	var buffer bytes.Buffer
-	buffer.WriteString(ret)
+	buffer.WriteString("[")
+
+	bArrayMemberAlreadyWritten := false
+	for resultsIterator.HasNext() {
+		queryResponse, err := resultsIterator.Next()
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+		// Add a comma before array members, suppress it for the first array member
+		if bArrayMemberAlreadyWritten == true {
+			buffer.WriteString(",")
+		}
+		buffer.WriteString("{\"timestamp\":")
+		buffer.WriteString("\"")
+		buffer.WriteString(queryResponse.Key)
+		buffer.WriteString("\"")
+
+		buffer.WriteString(", \"message\":")
+		// Record is a JSON object, so we write as-is
+		buffer.WriteString(string(queryResponse.Value))
+		buffer.WriteString("}")
+		bArrayMemberAlreadyWritten = true
+	}
+	buffer.WriteString("]")
+
+	fmt.Printf("- queryMessages:\n%s\n", buffer.String())
+
 	return shim.Success(buffer.Bytes())
 }
 
@@ -183,72 +249,39 @@ func (s *SmartContract) queryTest(APIstub shim.ChaincodeStubInterface) peer.Resp
 }
 
 // helper
-
-func (s *SmartContract) getAllElement(APIstub shim.ChaincodeStubInterface, key string) []byte {
-
-	startKey := key + " "
-	endKey := key + "~"
-
-	resultsIterator, err := APIstub.GetStateByRange(startKey, endKey)
-	if err != nil {
-		return []byte(err.Error())
-	}
-	defer resultsIterator.Close()
-
-	// buffer is a JSON array containing QueryResults
-	var buffer bytes.Buffer
-	buffer.WriteString("[")
-
-	bArrayMemberAlreadyWritten := false
-	for resultsIterator.HasNext() {
-		queryResponse, err := resultsIterator.Next()
-		if err != nil {
-			return []byte(err.Error())
-		}
-		// Add a comma before array members, suppress it for the first array member
-		if bArrayMemberAlreadyWritten == true {
-			buffer.WriteString(",")
-		}
-		buffer.WriteString("{\"Key\":")
-		buffer.WriteString("\"")
-		buffer.WriteString(queryResponse.Key)
-		buffer.WriteString("\"")
-
-		buffer.WriteString(", \"Record\":")
-		// Record is a JSON object, so we write as-is
-		buffer.WriteString(string(queryResponse.Value))
-		buffer.WriteString("}")
-		bArrayMemberAlreadyWritten = true
-	}
-	buffer.WriteString("]")
-
-	return buffer.Bytes()
+func getCurrentTimestamp() string {
+	timestamp := time.Now().UnixNano()
+	return strconv.FormatInt(timestamp, 10)
 }
 
-func countElements(APIstub shim.ChaincodeStubInterface, key string) string {
-
-	startKey := key + " "
-	endKey := key + "~"
-
-	resultsIterator, err := APIstub.GetStateByRange(startKey, endKey)
+func getCreatorEnrollmentId(APIstub shim.ChaincodeStubInterface) (string, error) {
+	enrollmentId, err := getClientCertAttribute(APIstub, "hf.EnrollmentID")
 	if err != nil {
-		return ""
+		// There was an error trying to retrieve the attribute
+		return "", err
 	}
 
-	defer resultsIterator.Close()
+	return enrollmentId, nil
+}
 
-	cnt := 0
-
-	for resultsIterator.HasNext() {
-		resultsIterator.Next()
-		cnt++
+func getClientCertAttribute(APIstub shim.ChaincodeStubInterface, attribute string) (string, error) {
+	// [{"name":"hf.IntermediateCA","value":"1"},{"name":"hf.GenCRL","value":"1"},{"name":"hf.Registrar.Attributes","value":"*"},{"name":"hf.AffiliationMgr","value":"1"},{"name":"hf.Registrar.Roles","value":"*"},{"name":"hf.Registrar.DelegateRoles","value":"*"},{"name":"hf.Revoker","value":"1"}]
+	// [{"name":"hf.EnrollmentID","value":"shuhan.mirza@gmail.com","ecert":true},{"name":"hf.Type","value":"client","ecert":true},{"name":"hf.Affiliation","value":"org1.department1","ecert":true}]
+	val, ok, err := cid.GetAttributeValue(APIstub, attribute)
+	if err != nil {
+		// There was an error trying to retrieve the attribute
+		return "", err
+	}
+	if !ok {
+		return "", errors.New("the client identity does not possess the attribute")
+		// The client identity does not possess the attribute
 	}
 
-	return strconv.Itoa(cnt)
+	return val, nil
 }
 
 // The main function is only relevant in unit test mode. Only included here for completeness.
-func main() { //kop
+func main() {
 
 	// Create a new Smart Contract
 	err := shim.Start(new(SmartContract))

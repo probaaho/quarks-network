@@ -235,6 +235,9 @@ async function addAffiliationOrg(org, department) {
 }
 
 
+//// send message to a channel ////
+
+
 // /////// MEDMAN ///////////////////
 //
 // appOrg1.get('/registered-product-list', async function (req, res) {

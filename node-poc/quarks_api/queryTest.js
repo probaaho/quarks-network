@@ -41,7 +41,7 @@ async function main(org) {
         });
 
         // Get the network (channel) our contract is deployed to.
-        const network = await gateway.getNetwork(env[org].channels["2-3"]);
+        const network = await gateway.getNetwork('channel-123');
 
         // Get the contract from the network.
         const contract = network.getContract(env[org].contractName);
@@ -51,7 +51,7 @@ async function main(org) {
         // queryAllCars transaction - requires no arguments, ex: ('queryAllCars')
 
         //const result = await contract.evaluateTransaction('queryAllInvoices');
-        const result = await contract.evaluateTransaction('queryProductCategory','PRODUCT0');
+        const result = await contract.evaluateTransaction('queryMessages','');
         //const result = await contract.evaluateTransaction('queryUserPubKey', 'test_zxcuser_0@becbuster.com');
         console.log(`Transaction has been evaluated, result is: ${result.toString()}`);
 
@@ -63,4 +63,4 @@ async function main(org) {
     }
 }
 
-main("nbr");
+main("org2");

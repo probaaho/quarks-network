@@ -26,20 +26,23 @@ async function main(org) {
         const wallet = new FileSystemWallet(walletPath);
         console.log(`Wallet path: ${walletPath}`);
 
+        //var username = env[org].adminUserName;
+        var username = "shuhan.mirza@gmail.com";
+
         // Check to see if we've already enrolled the user.
-        const userExists = await wallet.exists(env[org].adminUserName);
+        const userExists = await wallet.exists(username);
         if (!userExists) {
-            console.log(`An identity for the user "${env[org].adminUserName}" does not exist in the wallet`);
+            console.log(`An identity for the user "${username}" does not exist in the wallet`);
             console.log('Run the registerUser.js application before retrying'); //TODO: Check if this is correct
             return;
         }
 
         // Create a new gateway for connecting to our peer node.
         const gateway = new Gateway();
-        await gateway.connect(ccp, { wallet, identity: env[org].adminUserName, discovery: { enabled: false } });
+        await gateway.connect(ccp, { wallet, identity: username, discovery: { enabled: false } });
 
         // Get the network (channel) our contract is deployed to.
-        const network = await gateway.getNetwork(env[org].channels["1-4"]);
+        const network = await gateway.getNetwork("channel-1");
 
         // Get the contract from the network.
         const contract = network.getContract(env[org].contractName);
@@ -49,17 +52,19 @@ async function main(org) {
         // changeCarOwner transaction - requires 2 args , ex: ('changeCarOwner', 'CAR10', 'Dave')
 
         //await contract.submitTransaction('createCar', 'CAR12', 'Honda', 'Accord', 'Black', 'Tom');
-        await contract.submitTransaction('confirmInvoice',"INVOICE-1-4-2");
+        const result = await contract.submitTransaction('addMessage',"Yo Yo 1");
 
         console.log('Transaction has been submitted');
+        console.log(result.toString());
 
         // Disconnect from the gateway.
         await gateway.disconnect();
 
     } catch (error) {
         console.error(`Failed to submit transaction: ${error}`);
+        console.log(error.stack)
         process.exit(1);
     }
 }
 
-main("nbr");
+main("org1");
