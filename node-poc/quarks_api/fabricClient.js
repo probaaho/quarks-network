@@ -153,7 +153,7 @@ async function sendMessageChannel(FileSystemWallet, Gateway, path, orgConnection
     }
 }
 
-async function readMessageChannel(FileSystemWallet, Gateway, path, orgConnection, walletPathStr, userName, orgName, channelName, contractName) {
+async function readMessageChannel(FileSystemWallet, Gateway, path, orgConnection, walletPathStr, userName, orgName, channelName, contractName, fromTimestamp) {
 
     try {
         let contract = await getContract(FileSystemWallet,
@@ -166,7 +166,7 @@ async function readMessageChannel(FileSystemWallet, Gateway, path, orgConnection
             channelName,
             contractName)
 
-        let result = await contract.evaluateTransaction('queryMessages','');
+        let result = await contract.evaluateTransaction('queryMessages', fromTimestamp);
         return JSON.parse(result.toString())
 
     } catch (error) {

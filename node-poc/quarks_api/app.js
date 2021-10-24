@@ -320,7 +320,8 @@ appOrg1.get('/readMessage', async function (req, res) {
         readMessageResponse = await readMessageFromChannel(
             "org1",
             readMessageRequest["user"],
-            readMessageRequest["channel"]
+            readMessageRequest["channel"],
+            readMessageRequest["from_timestamp"]
         )
     }
     console.log(readMessageResponse)
@@ -337,7 +338,8 @@ appOrg2.get('/readMessage', async function (req, res) {
         readMessageResponse = await readMessageFromChannel(
             "org2",
             readMessageRequest["user"],
-            readMessageRequest["channel"]
+            readMessageRequest["channel"],
+            readMessageRequest["from_timestamp"]
         )
     }
     console.log(readMessageResponse)
@@ -351,11 +353,12 @@ appOrg3.get('/readMessage', async function (req, res) {
     console.log(readMessageRequest)
 
     let readMessageResponse
-    if (!isEmpty(readMessageRequest["user"]) && !isEmpty(readMessageRequest["channel"])) {
+    if (!isEmpty(readMessageRequest["user"]) && !isEmpty(readMessageRequest["channel"]) && !isEmpty(readMessageRequest["from_timestamp"])) {
         readMessageResponse = await readMessageFromChannel(
             "org3",
             readMessageRequest["user"],
-            readMessageRequest["channel"]
+            readMessageRequest["channel"],
+            readMessageRequest["from_timestamp"]
         )
     }
     console.log(readMessageResponse)
@@ -364,7 +367,7 @@ appOrg3.get('/readMessage', async function (req, res) {
 });
 
 
-async function readMessageFromChannel(org, username, channel) {
+async function readMessageFromChannel(org, username, channel, fromTimestamp) {
     let orgConnection = await getOrgConnection(org)
     let walletPathStr = env[org].walletPath
     let contractName = env[org].contractName
@@ -378,7 +381,9 @@ async function readMessageFromChannel(org, username, channel) {
         username,
         org,
         channel,
-        contractName)
+        contractName,
+        fromTimestamp
+    )
 }
 
 

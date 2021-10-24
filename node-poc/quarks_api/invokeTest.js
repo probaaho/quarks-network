@@ -52,7 +52,7 @@ async function main(org) {
         // changeCarOwner transaction - requires 2 args , ex: ('changeCarOwner', 'CAR10', 'Dave')
 
         //await contract.submitTransaction('createCar', 'CAR12', 'Honda', 'Accord', 'Black', 'Tom');
-        const result = await contract.submitTransaction('addMessage',"Yo Yo 1");
+        const result = await contract.submitTransaction('initLedger',"");
 
         console.log('Transaction has been submitted');
         console.log(result.toString());

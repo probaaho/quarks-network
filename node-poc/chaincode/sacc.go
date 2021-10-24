@@ -39,9 +39,6 @@ type Test struct { /// nevermind this
 	Email string `json:"email"`
 }
 
-const CC_INIT_TIMESTAMP_KEY = `CC_INIT_TIMESTAMP`
-const CC_DEFAULT_INIT_TIMESTAMP = `943920000000000` //Tuesday, 30 November 1999 00:00:00
-
 /*
  * The Init method is called when the Smart Contract is instantiated by the blockchain network
  * Best practice is to have any Ledger initialization in separate function -- see initLedger()
@@ -81,10 +78,6 @@ func (s *SmartContract) Invoke(APIstub shim.ChaincodeStubInterface) peer.Respons
 
 /////////////////////////////////// INVOKE ////////////////////////////////////
 func (s *SmartContract) initLedger(APIstub shim.ChaincodeStubInterface) peer.Response {
-	err := APIstub.PutState(CC_INIT_TIMESTAMP_KEY, []byte(getCurrentTimestamp()))
-	if err != nil {
-		return shim.Error(err.Error())
-	}
 	return shim.Success(nil)
 }
 
@@ -153,12 +146,11 @@ func (s *SmartContract) invokeTest(APIstub shim.ChaincodeStubInterface, args []s
 
 ///////////////////////////////////// QUERY ///////////////////////////////
 func (s *SmartContract) queryMessages(APIstub shim.ChaincodeStubInterface, args []string) peer.Response {
-	var startTime = ``
-	initTimeStampBytes, err := APIstub.GetState(CC_INIT_TIMESTAMP_KEY)
-	if err != nil {
-		startTime = CC_DEFAULT_INIT_TIMESTAMP
+	if len(args) != 1 {
+		return shim.Error("Incorrect number of arguments. Expecting 1")
 	}
-	startTime = string(initTimeStampBytes)
+
+	startTime := args[0]
 	endTime := getCurrentTimestamp()
 
 	resultsIterator, err := APIstub.GetStateByRange(startTime, endTime)

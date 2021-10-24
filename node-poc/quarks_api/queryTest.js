@@ -51,7 +51,7 @@ async function main(org) {
         // queryAllCars transaction - requires no arguments, ex: ('queryAllCars')
 
         //const result = await contract.evaluateTransaction('queryAllInvoices');
-        const result = await contract.evaluateTransaction('queryMessages','');
+        const result = await contract.evaluateTransaction('queryTest','');
         //const result = await contract.evaluateTransaction('queryUserPubKey', 'test_zxcuser_0@becbuster.com');
         console.log(`Transaction has been evaluated, result is: ${result.toString()}`);
 
