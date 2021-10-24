@@ -1,14 +1,10 @@
-const {Gateway, X509WalletMixin} = require("fabric-network");
-
 async function enrollAdmin(FabricCAServices, FileSystemWallet, X509WalletMixin, path, caUrl, walletPathStr, adminUserName, adminSecret, mspId) {
     try {
 
         // Create a new CA client for interacting with the CA.
         let ca = new FabricCAServices(caUrl);
 
-        // Create a new file system based wallet for managing identities.
-        let walletPath = path.join(process.cwd(), walletPathStr);
-        let wallet = new FileSystemWallet(walletPath);
+        let wallet = await getWallet(FileSystemWallet, path, walletPathStr)
 
         // Check to see if we've already enrolled the admin user.
         let adminExists = await wallet.exists(adminUserName);
@@ -40,10 +36,7 @@ async function enrollAdmin(FabricCAServices, FileSystemWallet, X509WalletMixin, 
 
 async function registerUser(FileSystemWallet, X509WalletMixin, path, Gateway, orgConnection, caUrl, walletPathStr, adminUserName, mspId, userName, departmentName) {
     try {
-
-        // Create a new file system based wallet for managing identities.
-        let walletPath = path.join(process.cwd(), walletPathStr);
-        let wallet = new FileSystemWallet(walletPath);
+        let wallet = await getWallet(FileSystemWallet, path, walletPathStr)
 
         // Check to see if we've already enrolled the user.
         let userExists = await wallet.exists(userName);
@@ -78,7 +71,7 @@ async function registerUser(FileSystemWallet, X509WalletMixin, path, Gateway, or
         }, adminIdentity);
 
         let enrollment = await ca.enroll({enrollmentID: userName, enrollmentSecret: secret});
-        const userIdentity = X509WalletMixin.createIdentity(mspId, enrollment.certificate, enrollment.key.toBytes());
+        let userIdentity = X509WalletMixin.createIdentity(mspId, enrollment.certificate, enrollment.key.toBytes());
         await wallet.import(userName, userIdentity);
         console.log(`Successfully registered and enrolled admin user "${userName}" and imported it into the wallet`);
 
@@ -90,15 +83,12 @@ async function registerUser(FileSystemWallet, X509WalletMixin, path, Gateway, or
     }
 }
 
-async function addAffiliationCA(FileSystemWallet, path, orgConnection, walletPathStr, adminUserName, adminSecret, orgName, departmentName) {
+async function addAffiliationCA(FileSystemWallet, Gateway, path, orgConnection, walletPathStr, adminUserName, adminSecret, orgName, departmentName) {
 
     try {
         let affiliation = orgName + "." + departmentName
 
-        // Create a new file system based wallet for managing identities.
-        let walletPath = path.join(process.cwd(), walletPathStr);
-        let wallet = new FileSystemWallet(walletPath);
-
+        let wallet = await getWallet(FileSystemWallet, path, walletPathStr)
 
         // Check to see if we've already enrolled the admin user.
         const adminExists = await wallet.exists(adminUserName);
@@ -108,7 +98,7 @@ async function addAffiliationCA(FileSystemWallet, path, orgConnection, walletPat
         }
 
         // Create a new gateway for connecting to our peer node.
-        const gateway = new Gateway();
+        let gateway = new Gateway();
         await gateway.connect(orgConnection, {wallet, identity: adminUserName, discovery: {enabled: false}});
 
         let client = gateway.getClient();
@@ -140,10 +130,89 @@ async function addAffiliationCA(FileSystemWallet, path, orgConnection, walletPat
 
 }
 
+async function sendMessageChannel(FileSystemWallet, Gateway, path, orgConnection, walletPathStr, userName, orgName, channelName, contractName, textContent) {
+
+    try {
+        let contract = await getContract(FileSystemWallet,
+            Gateway,
+            path,
+            orgConnection,
+            walletPathStr,
+            userName,
+            orgName,
+            channelName,
+            contractName)
+
+        let result = await contract.submitTransaction('addMessage', textContent);
+        return JSON.parse(result.toString())
+
+    } catch (error) {
+        let msg = `Failed to create contract: ${error}`
+        console.error(msg);
+        return Error(msg);
+    }
+}
+
+async function readMessageChannel(FileSystemWallet, Gateway, path, orgConnection, walletPathStr, userName, orgName, channelName, contractName) {
+
+    try {
+        let contract = await getContract(FileSystemWallet,
+            Gateway,
+            path,
+            orgConnection,
+            walletPathStr,
+            userName,
+            orgName,
+            channelName,
+            contractName)
+
+        let result = await contract.evaluateTransaction('queryMessages','');
+        return JSON.parse(result.toString())
+
+    } catch (error) {
+        let msg = `Failed to create contract: ${error}`
+        console.error(msg);
+        return Error(msg);
+    }
+}
+
+async function getContract(FileSystemWallet, Gateway, path, orgConnection, walletPathStr, userName, orgName, channelName, contractName) {
+    let wallet = await getWallet(FileSystemWallet, path, walletPathStr)
+
+    // Check to see if we've already enrolled the user.
+    let userExists = await wallet.exists(userName);
+    if (!userExists) {
+        let msg = `An identity for the user "${userName}" does not exist in the wallet`
+        console.log(msg);
+        throw Error(msg)
+    }
+
+    // Create a new gateway for connecting to our peer node.
+    let gateway = new Gateway();
+    await gateway.connect(orgConnection, {
+        wallet, identity: userName,
+        discovery: {enabled: false}
+    });
+
+    // Get the network (channel) our contract is deployed to.
+    let network = await gateway.getNetwork(channelName);
+
+    // Get the contract from the network.
+    return network.getContract(contractName);
+}
+
+async function getWallet(FileSystemWallet, path, walletPathStr) {
+    // Create a new file system based wallet for managing identities.
+    let walletPath = path.join(process.cwd(), walletPathStr);
+    return new FileSystemWallet(walletPath)
+}
+
 
 module.exports = {
     enrollAdmin,
     registerUser,
-    addAffiliationCA
+    addAffiliationCA,
+    sendMessageChannel,
+    readMessageChannel
 }
 
