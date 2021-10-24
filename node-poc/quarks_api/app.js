@@ -310,6 +310,78 @@ async function sendMessageToChannel(org, username, channel, text) {
 }
 
 
+//// read messages from a channel ////
+appOrg1.get('/readMessage', async function (req, res) {
+    let readMessageRequest = req.body;
+    console.log(readMessageRequest)
+
+    let readMessageResponse
+    if (!isEmpty(readMessageRequest["user"]) && !isEmpty(readMessageRequest["channel"])) {
+        readMessageResponse = await readMessageFromChannel(
+            "org1",
+            readMessageRequest["user"],
+            readMessageRequest["channel"]
+        )
+    }
+    console.log(readMessageResponse)
+    res.json(readMessageResponse);
+    return res;
+});
+
+appOrg2.get('/readMessage', async function (req, res) {
+    let readMessageRequest = req.body;
+    console.log(readMessageRequest)
+
+    let readMessageResponse
+    if (!isEmpty(readMessageRequest["user"]) && !isEmpty(readMessageRequest["channel"])) {
+        readMessageResponse = await readMessageFromChannel(
+            "org2",
+            readMessageRequest["user"],
+            readMessageRequest["channel"]
+        )
+    }
+    console.log(readMessageResponse)
+    res.json(readMessageResponse);
+    return res;
+});
+
+
+appOrg3.get('/readMessage', async function (req, res) {
+    let readMessageRequest = req.body;
+    console.log(readMessageRequest)
+
+    let readMessageResponse
+    if (!isEmpty(readMessageRequest["user"]) && !isEmpty(readMessageRequest["channel"])) {
+        readMessageResponse = await readMessageFromChannel(
+            "org3",
+            readMessageRequest["user"],
+            readMessageRequest["channel"]
+        )
+    }
+    console.log(readMessageResponse)
+    res.json(readMessageResponse);
+    return res;
+});
+
+
+async function readMessageFromChannel(org, username, channel) {
+    let orgConnection = await getOrgConnection(org)
+    let walletPathStr = env[org].walletPath
+    let contractName = env[org].contractName
+
+    return FabricClient.readMessageChannel(
+        FileSystemWallet,
+        Gateway,
+        path,
+        orgConnection,
+        walletPathStr,
+        username,
+        org,
+        channel,
+        contractName)
+}
+
+
 /////// functions
 function isEmpty(str) {
     return (!str || str.length === 0);
