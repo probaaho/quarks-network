@@ -101,7 +101,7 @@ app.post('/sendMessage',
     }
 );
 
-app.post('/queryMessage',
+app.post('/readMessage',
     body('channel').not().isEmpty().escape(),
     body('email').isEmail().escape(),
     (req, res) => {
