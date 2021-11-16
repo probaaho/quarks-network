@@ -24,7 +24,7 @@ class WebUser(HttpUser):
     quarks_channels = ['channel-123']
 
     @tag('centralized')
-    @task
+    @task(1)
     def centralized_send_message(self):
         user_email = random.choice(self.centralized_users)
         user_channel = random.choice(self.centralized_channels)
@@ -43,7 +43,7 @@ class WebUser(HttpUser):
         self.client.post(url=self.api_centralized_send_message, json=json_body, headers=headers)
 
     @tag('centralized')
-    @task
+    @task(2)
     def centralized_read_message(self):
         user_email = random.choice(self.centralized_users)
         user_channel = random.choice(self.centralized_channels)
@@ -60,7 +60,7 @@ class WebUser(HttpUser):
         self.client.post(url=self.api_centralized_read_message, json=json_body, headers=headers)
 
     @tag('quarks')
-    @task
+    @task(1)
     def quarks_send_message(self):
         user_email = random.choice(self.quarks_users)
         user_channel = random.choice(self.quarks_channels)
@@ -75,7 +75,7 @@ class WebUser(HttpUser):
         self.client.post(url=self.api_quarks_send_message, json=json_body)
 
     @tag('quarks')
-    @task
+    @task(2)
     def quarks_read_message(self):
         user_email = random.choice(self.quarks_users)
         user_channel = random.choice(self.quarks_channels)
