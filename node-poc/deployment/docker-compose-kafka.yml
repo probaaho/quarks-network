@@ -12,9 +12,9 @@ services:
             - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org1.example.com-cert.pem
             - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/897a64a85d73742bb2f4230bd4d65595c5b51d90ceac57739a1ff7136dff391c_sk
         extra_hosts:
-            - "peer0.org1.example.com:${HOST_B}"
-            - "peer0.org2.example.com:${HOST_C}"
-            - "peer0.org3.example.com:${HOST_D}"
+            - "peer0.org1.example.com:${HOST_A}"
+            - "peer0.org2.example.com:${HOST_B}"
+            - "peer0.org3.example.com:${HOST_B}"
         ports:
             - "7054:7054"
         command: sh -c 'fabric-ca-server start -b admin:adminpw'
@@ -35,9 +35,9 @@ services:
             - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org2.example.com-cert.pem
             - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/a07431e9b59f667a2a19cde320e6f0a0d3850abc28269dfd005426893649caa3_sk
         extra_hosts:
-            - "peer0.org1.example.com:${HOST_B}"
-            - "peer0.org2.example.com:${HOST_C}"
-            - "peer0.org3.example.com:${HOST_D}"
+            - "peer0.org1.example.com:${HOST_A}"
+            - "peer0.org2.example.com:${HOST_B}"
+            - "peer0.org3.example.com:${HOST_B}"
 
         ports:
             - "8054:7054"
@@ -59,9 +59,9 @@ services:
             - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org3.example.com-cert.pem
             - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/1d0be5be16d2ad11d56efc5b7f71d38ec8932bac49e585245274280a278082f6_sk
         extra_hosts:
-            - "peer0.org1.example.com:${HOST_B}"
-            - "peer0.org2.example.com:${HOST_C}"
-            - "peer0.org3.example.com:${HOST_D}"
+            - "peer0.org1.example.com:${HOST_A}"
+            - "peer0.org2.example.com:${HOST_B}"
+            - "peer0.org3.example.com:${HOST_B}"
         ports:
             - "9054:7054"
         command: sh -c 'fabric-ca-server start -b admin:adminpw'
@@ -209,9 +209,9 @@ services:
             - ORDERER_ABSOLUTEMAXBYTES=${ORDERER_ABSOLUTEMAXBYTES}
             - ORDERER_PREFERREDMAXBYTES=${ORDERER_PREFERREDMAXBYTES}
         extra_hosts:
-            - "peer0.org1.example.com:${HOST_B}"
-            - "peer0.org2.example.com:${HOST_C}"
-            - "peer0.org3.example.com:${HOST_D}"
+            - "peer0.org1.example.com:${HOST_A}"
+            - "peer0.org2.example.com:${HOST_B}"
+            - "peer0.org3.example.com:${HOST_B}"
         volumes:
             - ../crypto-config/ordererOrganizations/example.com/orderers/orderer0.example.com/msp:/var/hyperledger/msp
             - ../crypto-config/ordererOrganizations/example.com/orderers/orderer0.example.com/tls:/var/hyperledger/tls
@@ -246,9 +246,9 @@ services:
             - ORDERER_ABSOLUTEMAXBYTES=${ORDERER_ABSOLUTEMAXBYTES}
             - ORDERER_PREFERREDMAXBYTES=${ORDERER_PREFERREDMAXBYTES}
         extra_hosts:
-            - "peer0.org1.example.com:${HOST_B}"
-            - "peer0.org2.example.com:${HOST_C}"
-            - "peer0.org3.example.com:${HOST_D}"
+            - "peer0.org1.example.com:${HOST_A}"
+            - "peer0.org2.example.com:${HOST_B}"
+            - "peer0.org3.example.com:${HOST_B}"
         volumes:
             - ../crypto-config/ordererOrganizations/example.com/orderers/orderer1.example.com/msp:/var/hyperledger/msp
             - ../crypto-config/ordererOrganizations/example.com/orderers/orderer1.example.com/tls:/var/hyperledger/tls
@@ -281,9 +281,9 @@ services:
             - ORDERER_ABSOLUTEMAXBYTES=${ORDERER_ABSOLUTEMAXBYTES}
             - ORDERER_PREFERREDMAXBYTES=${ORDERER_PREFERREDMAXBYTES}
         extra_hosts:
-            - "peer0.org1.example.com:${HOST_B}"
-            - "peer0.org2.example.com:${HOST_C}"
-            - "peer0.org3.example.com:${HOST_D}"
+            - "peer0.org1.example.com:${HOST_A}"
+            - "peer0.org2.example.com:${HOST_B}"
+            - "peer0.org3.example.com:${HOST_B}"
         volumes:
             - ../crypto-config/ordererOrganizations/example.com/orderers/orderer2.example.com/msp:/var/hyperledger/msp
             - ../crypto-config/ordererOrganizations/example.com/orderers/orderer2.example.com/tls:/var/hyperledger/tls

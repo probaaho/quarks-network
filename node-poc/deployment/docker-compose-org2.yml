@@ -27,14 +27,14 @@ services:
             - ../crypto-config/peerOrganizations/org2.example.com/users:/var/hyperledger/users
             - ../network-config/:/var/hyperledger/configs
         extra_hosts:
-            - "orderer0.example.com:${HOST_A}"
-            - "orderer1.example.com:${HOST_A}"
-            - "orderer2.example.com:${HOST_A}"
-            - "ca.org1.example.com:${HOST_A}"
-            - "ca.org2.example.com:${HOST_A}"
-            - "ca.org3.example.com:${HOST_A}"
-            - "peer0.org1.example.com:${HOST_B}"
-            - "peer0.org3.example.com:${HOST_D}"
+            - "orderer0.example.com:${HOST_B}"
+            - "orderer1.example.com:${HOST_B}"
+            - "orderer2.example.com:${HOST_B}"
+            - "ca.org1.example.com:${HOST_B}"
+            - "ca.org2.example.com:${HOST_B}"
+            - "ca.org3.example.com:${HOST_B}"
+            - "peer0.org1.example.com:${HOST_A}"
+            - "peer0.org3.example.com:${HOST_B}"
 
         networks:
             behave:

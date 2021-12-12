@@ -18,15 +18,13 @@ services:
       - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp
       - CORE_CHAINCODE_KEEPALIVE=10
     extra_hosts:
-      - "orderer0.example.com:${HOST_A}"
-      - "orderer1.example.com:${HOST_A}"
-      - "orderer2.example.com:${HOST_A}"
+      - "orderer0.example.com:${HOST_B}"
+      - "orderer1.example.com:${HOST_B}"
+      - "orderer2.example.com:${HOST_B}"
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
     command: /bin/bash
     volumes:
       - /var/run/:/host/var/run/
-#      - $GOPATH/src/github.com/hyperledger/fabric/:/opt/gopath/src/github.com/hyperledger/fabric/
-#      - ../go/src/github.com/hyperledger/fabric/:/opt/gopath/src/github.com/hyperledger/fabric/
       - ../go/src/github.com/hyperledger/fabric-chaincode-go/:/opt/gopath/src/github.com/hyperledger/fabric-chaincode-go/
       - ../go/src/github.com/hyperledger/fabric-protos-go/:/opt/gopath/src/github.com/hyperledger/fabric-protos-go/
       - ../go/src/github.com/golang/protobuf/:/opt/gopath/src/github.com/golang/protobuf/
