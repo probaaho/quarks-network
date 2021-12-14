@@ -8,7 +8,20 @@ req:
 - bin files
 - python
 - build-essentials
-- /etc/host setup for node api [quark.org1.com][quark.org2.com][quark.org3.com]
+- /etc/host setup for node api 
+```
+10.100.222.179 orderer.org1.com
+10.100.222.179 orderer.org2.com
+10.100.222.179 orderer.org3.com
+
+10.100.222.179 ca.org1.com
+10.100.222.179 ca.org2.com
+10.100.222.179 ca.org3.com
+
+10.100.222.178 peer.org1.com
+10.100.222.179 peer.org2.com
+10.100.222.179 peer.org3.com
+```
 
 
 

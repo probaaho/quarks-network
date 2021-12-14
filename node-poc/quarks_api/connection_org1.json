@@ -63,7 +63,7 @@
   },
   "certificateAuthorities": {
     "ca.org1.example.com": {
-      "url": "http://quark.org1.com:7054",
+      "url": "http://ca.org1.com:7054",
       "caName": "ca.org1.example.com"
     }
   }

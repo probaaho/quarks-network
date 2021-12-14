@@ -47,23 +47,23 @@
   },
   "orderers": {
     "orderer0.example.com": {
-      "url": "grpc://quark.org1.com:7050"
+      "url": "grpc://orderer.org1.com:7050"
     },
     "orderer1.example.com": {
-      "url": "grpc://quark.org2.com:8050"
+      "url": "grpc://orderer.org2.com:8050"
     },
     "orderer2.example.com": {
-      "url": "grpc://quark.org3.com:9050"
+      "url": "grpc://orderer.org3.com:9050"
     }
   },
   "peers": {
     "peer0.org2.example.com": {
-      "url": "grpc://quark.org2.com:8051"
+      "url": "grpc://peer.org2.com:8051"
     }
   },
   "certificateAuthorities": {
     "ca.org2.example.com": {
-      "url": "http://quark.org2.com:8054",
+      "url": "http://ca.org2.com:8054",
       "caName": "ca.org2.example.com"
     }
   }
