@@ -6,6 +6,9 @@ req:
 - docker, docker-compose
 - node v10 -- nvm -- npm
 - bin files
+- python
+- build-essentials
+- /etc/host setup for node api [quark.org1.com][quark.org2.com][quark.org3.com]
 
 
 
