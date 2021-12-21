@@ -92,4 +92,4 @@ class WebUser(HttpUser):
         return 'I am {}. current time is {}'.format(username, datetime.now())
 
     def get_timestamp(self):
-        return f'{(time.time() - 600.00) * 1000000000:.0f}'
+        return f'{(time.time() - 10.00) * 1000000000:.0f}'
