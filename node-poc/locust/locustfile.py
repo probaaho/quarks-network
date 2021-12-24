@@ -13,12 +13,12 @@ class WebUser(HttpUser):
     centralized_token = 'qwerty12345'
     centralized_channels = ['channel-123', 'channel-23', 'channel-1']
 
-    api_centralized_send_message = 'localhost:3000/sendMessage'
-    api_centralized_read_message = 'localhost:3000/readMessage'
+    api_centralized_send_message = '10.100.222.178:3000/sendMessage'
+    api_centralized_read_message = '10.100.222.178:3000/readMessage'
 
     # -----------
-    api_quarks_send_message = 'localhost:3001/sendMessage'
-    api_quarks_read_message = 'localhost:3001/readMessage'
+    api_quarks_send_message = '10.100.222.178:3001/sendMessage'
+    api_quarks_read_message = '10.100.222.178:3001/readMessage'
 
     quarks_users = ['alice@org1.com']
     quarks_channels = ['channel-123']
