@@ -23,7 +23,7 @@ Network View:
 ![](doc/img/quarks_hld.png)
 
 Alice, Bob, and Charlie communicating in Quarks
-Network:
+Network:  
 ![](doc/img/quarks_hld_chat.png)
 ### Message flow in the proof-of-concept-network
 ![](doc/img/quarks_poc.png)
