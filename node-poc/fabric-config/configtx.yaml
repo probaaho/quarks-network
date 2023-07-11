@@ -28,6 +28,14 @@ Organizations:
             - Host: peer0.org3.example.com
               Port: 7051
 
+    - &Org4
+        Name: Org4MSP
+        ID: Org4MSP
+        MSPDir: ../crypto-config/peerOrganizations/org4.example.com/msp
+        AnchorPeers:
+            - Host: peer0.org4.example.com
+              Port: 7051
+
 Orderer: &OrdererDefaults
 
     OrdererType: kafka
@@ -35,9 +43,10 @@ Orderer: &OrdererDefaults
         - orderer0.example.com:7050
         - orderer1.example.com:7050
         - orderer2.example.com:7050
-    BatchTimeout: 2s
+        - orderer3.example.com:7050
+    BatchTimeout: 1s
     BatchSize:
-        MaxMessageCount: 10
+        MaxMessageCount: 500
         AbsoluteMaxBytes: 99 MB
         PreferredMaxBytes: 512 KB
     Kafka:
@@ -63,6 +72,17 @@ Profiles:
                     - *Org1
                     - *Org2
                     - *Org3
+                    - *Org3
+    Channel-1234:
+        Consortium: SampleConsortium
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *Org1
+                - *Org2
+                - *Org3
+                - *Org4
+
     Channel-123:
         Consortium: SampleConsortium
         Application:
@@ -71,13 +91,13 @@ Profiles:
                 - *Org1
                 - *Org2
                 - *Org3
-    Channel-23:
+    Channel-12:
         Consortium: SampleConsortium
         Application:
             <<: *ApplicationDefaults
             Organizations:
+                - *Org1
                 - *Org2
-                - *Org3
     Channel-1:
         Consortium: SampleConsortium
         Application:
