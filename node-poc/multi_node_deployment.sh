@@ -1,13 +1,18 @@
 #!/bin/bash
 
-quarks_one_ip=10.100.222.178
-quarks_two_ip=10.100.222.179
+quarks_one_ip=one.quarks.com
+quarks_two_ip=two.quarks.com
+quarks_three_ip=three.quarks.com
+quarks_four_ip=four.quarks.com
+
 project_path=~/quarks-network/node-poc
 project_docker_path=~/quarks-network/node-poc/deployment
 
 ssh_cmd='ssh -o StrictHostKeyChecking=no '
-ssh_quarks_one="${ssh_cmd} quarks@${quarks_one_ip}"
-ssh_quarks_two="${ssh_cmd} quarks@${quarks_two_ip}"
+ssh_quarks_one="${ssh_cmd} user@${quarks_one_ip}"
+ssh_quarks_two="${ssh_cmd} user@${quarks_two_ip}"
+ssh_quarks_three="${ssh_cmd} user@${quarks_three_ip}"
+ssh_quarks_four="${ssh_cmd} user@${quarks_four_ip}"
 scp_cmd='scp -o StrictHostKeyChecking=no'
 
 
@@ -15,15 +20,26 @@ destroy_network () {
   echo '################## Docker kill and rm ##############################################'
   $ssh_quarks_one 'docker rm -f $(docker ps -a -q)'
   $ssh_quarks_two 'docker rm -f $(docker ps -a -q)'
+  $ssh_quarks_one 'docker rm -f $(docker ps -a -q)'
+  $ssh_quarks_two 'docker rm -f $(docker ps -a -q)'
+  
 
   $ssh_quarks_one 'docker volume rm $(docker volume ls -q)'
   $ssh_quarks_two 'docker volume rm $(docker volume ls -q)'
+  $ssh_quarks_three 'docker volume rm $(docker volume ls -q)'
+  $ssh_quarks_four 'docker volume rm $(docker volume ls -q)'
 
   $ssh_quarks_one 'docker rmi $(docker images net-peer* -q)'
   $ssh_quarks_two 'docker rmi $(docker images net-peer* -q)'
+  $ssh_quarks_three 'docker rmi $(docker images net-peer* -q)'
+  $ssh_quarks_four 'docker rmi $(docker images net-peer* -q)'
 }
 
 destroy_network
+
+
+echo "DONE"
+sleep 10000
 
 # deploy ca, zookeerper, kafka and orderers
 gnome-terminal -- $ssh_quarks_two 'cd ~/quarks-network/node-poc/deployment && docker-compose -f docker-compose-kafka.yml up'
