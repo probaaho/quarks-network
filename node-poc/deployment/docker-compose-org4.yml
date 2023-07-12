@@ -88,7 +88,7 @@ services:
         environment:
             - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
             - FABRIC_CA_SERVER_CA_NAME=ca.org4.example.com
-            - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org3.example.com-cert.pem
+            - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org4.example.com-cert.pem
             - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/d887d62b00d8314b15c476a2b6bf0406c9216af0ebfd1022a507221ca24ad7a6_sk
         extra_hosts:
             - "peer0.org1.example.com:${HOST_A}"
