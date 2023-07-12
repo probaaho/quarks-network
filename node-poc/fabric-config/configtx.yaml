@@ -179,6 +179,11 @@ Orderer: &OrdererDefaults
               Port: 7050
               ClientTLSCert: ../crypto-config/ordererOrganizations/example.com/orderers/orderer3.example.com/tls/server.crt
               ServerTLSCert: ../crypto-config/ordererOrganizations/example.com/orderers/orderer3.example.com/tls/server.crt
+            - Host: orderer4.example.com
+              Port: 7050
+              ClientTLSCert: ../crypto-config/ordererOrganizations/example.com/orderers/orderer4.example.com/tls/server.crt
+              ServerTLSCert: ../crypto-config/ordererOrganizations/example.com/orderers/orderer4.example.com/tls/server.crt
+              
 
     Organizations:
 
@@ -267,12 +272,17 @@ Profiles:
                   Port: 7050
                   ClientTLSCert: ../crypto-config/ordererOrganizations/example.com/orderers/orderer3.example.com/tls/server.crt
                   ServerTLSCert: ../crypto-config/ordererOrganizations/example.com/orderers/orderer3.example.com/tls/server.crt
+                - Host: orderer4.example.com
+                  Port: 7050
+                  ClientTLSCert: ../crypto-config/ordererOrganizations/example.com/orderers/orderer4.example.com/tls/server.crt
+                  ServerTLSCert: ../crypto-config/ordererOrganizations/example.com/orderers/orderer4.example.com/tls/server.crt
 
             Addresses:
                 - orderer0.example.com:7050
                 - orderer1.example.com:7050
                 - orderer2.example.com:7050
                 - orderer3.example.com:7050
+                - orderer4.example.com:7050
             Organizations:
             - *OrdererOrg
             Capabilities:

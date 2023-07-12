@@ -79,7 +79,7 @@ echo
 echo "################## Channel-123 Creation and Joining #######################################"
 # create channel-123 from peer0 on org1
 # it connects to orderer0
-docker exec cli1 peer channel create -o orderer.example.com:7050 -c channel-1234 -f ./network-config/channel-1234.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer0.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+docker exec cli1 peer channel create -o orderer0.example.com:7050 -c channel-1234 -f ./network-config/channel-1234.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer0.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
 
 
 $ssh_quarks_one 'docker exec -e "CORE_PEER_LOCALMSPID=Org1MSP" -e "CORE_PEER_MSPCONFIGPATH=/var/hyperledger/users/Admin@org1.example.com/msp" peer0.org1.example.com peer channel create -o orderer0.example.com:7050 -c channel-123 -f /var/hyperledger/configs/channel-123.tx'
