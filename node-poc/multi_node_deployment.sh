@@ -65,7 +65,7 @@ echo '################## Deployment Initiation in org3 #########################
 $ssh_quarks_three 'cd ~/quarks-network/node-poc/deployment && docker-compose -f docker-compose-org3cli.yml up -d'
 
 echo
-echo '################## Deployment Initiation in org3 #####################################'
+echo '################## Deployment Initiation in org4 #####################################'
 $ssh_quarks_four 'cd ~/quarks-network/node-poc/deployment && docker-compose -f docker-compose-org4cli.yml up -d'
 
 
