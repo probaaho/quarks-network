@@ -1,5 +1,10 @@
 version: "2"
 
+
+volumes:
+  orderer1.example.com:
+  peer0.org2.example.com:
+
 networks:
     behave:
 

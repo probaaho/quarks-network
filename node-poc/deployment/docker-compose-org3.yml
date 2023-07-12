@@ -1,5 +1,10 @@
 version: "2"
 
+volumes:
+  orderer2.example.com:
+  peer0.org3.example.com:
+
+
 networks:
     behave:
 
@@ -70,7 +75,7 @@ services:
             - ../crypto-config/ordererOrganizations/example.com/orderers/orderer2.example.com/msp:/var/hyperledger/msp
             - ../crypto-config/ordererOrganizations/example.com/orderers/orderer2.example.com/tls:/var/hyperledger/tls
             - ../network-config/:/var/hyperledger/configs
-            - orderer2.com:/var/hyperledger/production/orderer
+            - orderer2.example.com:/var/hyperledger/production/orderer
 
         networks:
             behave:
