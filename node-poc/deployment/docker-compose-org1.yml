@@ -3,6 +3,7 @@ version: "2"
 volumes:
   orderer0.example.com:
   orderer4.example.com:
+  orderer1.example.com:
   peer0.org1.example.com:
 
 networks:
@@ -85,6 +86,39 @@ services:
         ports:
             - 7050:7050
 
+    orderer1.example.com:
+        extends:
+            file: docker-compose-base.yml
+            service: orderer
+        container_name: orderer1.example.com
+        environment:
+            - ORDERER_HOST=orderer1.example.com
+            - ORDERER_ABSOLUTEMAXBYTES=${ORDERER_ABSOLUTEMAXBYTES}
+            - ORDERER_PREFERREDMAXBYTES=${ORDERER_PREFERREDMAXBYTES}
+        extra_hosts:
+            - "peer0.org2.example.com:${HOST_B}"
+            - "orderer1.example.com:${HOST_B}"
+            - "ca.org2.example.com:${HOST_B}"
+            - "peer0.org3.example.com:${HOST_C}"
+            - "orderer2.example.com:${HOST_C}"
+            - "ca.org3.example.com:${HOST_C}"
+            - "peer0.org4.example.com:${HOST_D}"
+            - "orderer3.example.com:${HOST_D}"
+            - "ca.org4.example.com:${HOST_D}"
+
+        volumes:
+            - ../crypto-config/ordererOrganizations/example.com/orderers/orderer1.example.com/msp:/var/hyperledger/msp
+            - ../crypto-config/ordererOrganizations/example.com/orderers/orderer1.example.com/tls:/var/hyperledger/tls
+            - ../network-config/:/var/hyperledger/configs
+            - orderer1.example.com:/var/hyperledger/production/orderer
+
+        networks:
+            behave:
+                aliases:
+                    - ${CORE_PEER_NETWORKID}
+        ports:
+            - 8050:7050
+
     orderer4.example.com:
         extends:
             file: docker-compose-base.yml
@@ -116,7 +150,7 @@ services:
                 aliases:
                     - ${CORE_PEER_NETWORKID}
         ports:
-            - 8050:7050
+            - 9050:7050
 
     ca.org1.example.com:
         image: hyperledger/fabric-ca:1.4.9
