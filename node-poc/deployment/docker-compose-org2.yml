@@ -27,14 +27,15 @@ services:
             - ../crypto-config/peerOrganizations/org2.example.com/users:/var/hyperledger/users
             - ../network-config/:/var/hyperledger/configs
         extra_hosts:
-            - "orderer0.example.com:${HOST_B}"
-            - "orderer1.example.com:${HOST_B}"
-            - "orderer2.example.com:${HOST_B}"
-            - "ca.org1.example.com:${HOST_B}"
-            - "ca.org2.example.com:${HOST_B}"
-            - "ca.org3.example.com:${HOST_B}"
             - "peer0.org1.example.com:${HOST_A}"
-            - "peer0.org3.example.com:${HOST_B}"
+            - "orderer0.example.com:${HOST_A}"
+            - "ca.org1.example.com:${HOST_A}"
+            - "peer0.org3.example.com:${HOST_C}"
+            - "orderer2.example.com:${HOST_C}"
+            - "ca.org3.example.com:${HOST_C}"
+            - "peer0.org4.example.com:${HOST_D}"
+            - "orderer3.example.com:${HOST_D}"
+            - "ca.org4.example.com:${HOST_D}"
 
         networks:
             behave:
@@ -43,4 +44,66 @@ services:
         ports:
             - 8051:7051
             - 8053:7053
+
+   orderer1.example.com:
+        extends:
+            file: docker-compose-base.yml
+            service: orderer
+        container_name: orderer1.example.com
+        environment:
+            - ORDERER_HOST=orderer1.example.com
+            - ORDERER_ABSOLUTEMAXBYTES=${ORDERER_ABSOLUTEMAXBYTES}
+            - ORDERER_PREFERREDMAXBYTES=${ORDERER_PREFERREDMAXBYTES}
+        extra_hosts:
+            - "peer0.org1.example.com:${HOST_A}"
+            - "orderer0.example.com:${HOST_A}"
+            - "ca.org1.example.com:${HOST_A}"
+            - "peer0.org3.example.com:${HOST_C}"
+            - "orderer2.example.com:${HOST_C}"
+            - "ca.org3.example.com:${HOST_C}"
+            - "peer0.org4.example.com:${HOST_D}"
+            - "orderer3.example.com:${HOST_D}"
+            - "ca.org4.example.com:${HOST_D}"
+
+        volumes:
+            - ../crypto-config/ordererOrganizations/example.com/orderers/orderer1.example.com/msp:/var/hyperledger/msp
+            - ../crypto-config/ordererOrganizations/example.com/orderers/orderer1.example.com/tls:/var/hyperledger/tls
+            - ../network-config/:/var/hyperledger/configs
+
+        networks:
+            behave:
+                aliases:
+                    - ${CORE_PEER_NETWORKID}
+        ports:
+            - 8050:7050
+
+    ca.org2.example.com:
+        image: hyperledger/fabric-ca:1.4.9
+        environment:
+            - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+            - FABRIC_CA_SERVER_CA_NAME=ca.org2.example.com
+            - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org2.example.com-cert.pem
+            - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/59779c281c5da05157b80e32f82fa96ced21dee6d862fbb37bbe4426a8b126d2_sk
+        extra_hosts:
+            - "peer0.org1.example.com:${HOST_A}"
+            - "orderer0.example.com:${HOST_A}"
+            - "ca.org1.example.com:${HOST_A}"
+            - "peer0.org3.example.com:${HOST_C}"
+            - "orderer2.example.com:${HOST_C}"
+            - "ca.org3.example.com:${HOST_C}"
+            - "peer0.org4.example.com:${HOST_D}"
+            - "orderer3.example.com:${HOST_D}"
+            - "ca.org4.example.com:${HOST_D}"
+
+        ports:
+            - "8054:7054"
+        command: sh -c 'fabric-ca-server start -b admin:adminpw'
+        volumes:
+            - ../crypto-config/peerOrganizations/org2.example.com/ca/:/etc/hyperledger/fabric-ca-server-config
+            - ../fabric-ca-db/org2/:/etc/hyperledger/fabric-ca-server
+        container_name: ca.org2.example.com
+        networks:
+            behave:
+                aliases:
+                    - ${CORE_PEER_NETWORKID}
 

@@ -27,6 +27,8 @@ export CHANNEL1_NAME=channel-1
 export CHANNEL1_PROFILE=Channel-1
 
 # generate orderer.block on config directory
+configtxgen -profile OrdererGenesisRaft -outputBlock ./network-config/orderer.block 
+
 configtxgen -profile OrdererGenesisRaft -outputBlock ./network-config/${CHANNEL1234_NAME}.block -channelID ${CHANNEL1234_NAME}
 configtxgen -profile OrdererGenesisRaft -outputBlock ./network-config/${CHANNEL123_NAME}.block -channelID ${CHANNEL123_NAME}
 configtxgen -profile OrdererGenesisRaft -outputBlock ./network-config/${CHANNEL12_NAME}.block -channelID ${CHANNEL12_NAME}

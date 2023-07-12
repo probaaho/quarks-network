@@ -139,7 +139,7 @@ Capabilities:
 
 Orderer: &OrdererDefaults
 
-    OrdererType: etcdraft
+    OrdererType: solo
 
     Addresses:
         - orderer0.example.com:7050

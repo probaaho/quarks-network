@@ -35,19 +35,23 @@ destroy_network () {
   $ssh_quarks_four 'docker rmi $(docker images net-peer* -q)'
 }
 
+sync_project() {
+  echo '################## Sync Git ##############################################'
+  $ssh_quarks_one 'cd ~/quarks-network/ && git pull --rebase'
+  $ssh_quarks_two 'cd ~/quarks-network/ && git pull --rebase'
+  $ssh_quarks_one 'cd ~/quarks-network/ && git pull --rebase'
+  $ssh_quarks_two 'cd ~/quarks-network/ && git pull --rebase'
+}
+
 destroy_network
+sync_project
 
 
-echo "DONE"
-sleep 10000
-
-# deploy ca, zookeerper, kafka and orderers
-gnome-terminal -- $ssh_quarks_two 'cd ~/quarks-network/node-poc/deployment && docker-compose -f docker-compose-kafka.yml up'
-
-################## Peer Initiation in org1 org2 org3 ####################################'
+################## Initiation in org1 org2 org3 org4 ####################################'
 gnome-terminal -- $ssh_quarks_one 'cd ~/quarks-network/node-poc/deployment && docker-compose -f docker-compose-org1.yml up'
 gnome-terminal -- $ssh_quarks_two 'cd ~/quarks-network/node-poc/deployment && docker-compose -f docker-compose-org2.yml up'
-gnome-terminal -- $ssh_quarks_two 'cd ~/quarks-network/node-poc/deployment && docker-compose -f docker-compose-org3.yml up'
+gnome-terminal -- $ssh_quarks_three 'cd ~/quarks-network/node-poc/deployment && docker-compose -f docker-compose-org3.yml up'
+gnome-terminal -- $ssh_quarks_four 'cd ~/quarks-network/node-poc/deployment && docker-compose -f docker-compose-org4.yml up'
 
 echo '################## Deployment Initiation in org1 #####################################'
 $ssh_quarks_one 'cd ~/quarks-network/node-poc/deployment && docker-compose -f docker-compose-org1cli.yml up -d'
@@ -58,7 +62,15 @@ $ssh_quarks_two 'cd ~/quarks-network/node-poc/deployment && docker-compose -f do
 
 echo
 echo '################## Deployment Initiation in org3 #####################################'
-$ssh_quarks_two 'cd ~/quarks-network/node-poc/deployment && docker-compose -f docker-compose-org3cli.yml up -d'
+$ssh_quarks_three 'cd ~/quarks-network/node-poc/deployment && docker-compose -f docker-compose-org3cli.yml up -d'
+
+echo
+echo '################## Deployment Initiation in org3 #####################################'
+$ssh_quarks_four 'cd ~/quarks-network/node-poc/deployment && docker-compose -f docker-compose-org4cli.yml up -d'
+
+
+echo "DONE"
+sleep 10000
 
 echo "################# wait for 10 seconds #################################"
 sleep 10
