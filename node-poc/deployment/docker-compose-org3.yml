@@ -26,6 +26,7 @@ services:
             - ../crypto-config/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls:/var/hyperledger/tls
             - ../crypto-config/peerOrganizations/org3.example.com/users:/var/hyperledger/users
             - ../network-config/:/var/hyperledger/configs
+            - peer0.org3.example.com:/var/hyperledger/production
         extra_hosts:
             - "peer0.org1.example.com:${HOST_A}"
             - "orderer0.example.com:${HOST_A}"
@@ -69,6 +70,7 @@ services:
             - ../crypto-config/ordererOrganizations/example.com/orderers/orderer2.example.com/msp:/var/hyperledger/msp
             - ../crypto-config/ordererOrganizations/example.com/orderers/orderer2.example.com/tls:/var/hyperledger/tls
             - ../network-config/:/var/hyperledger/configs
+            - orderer2.com:/var/hyperledger/production/orderer
 
         networks:
             behave:
