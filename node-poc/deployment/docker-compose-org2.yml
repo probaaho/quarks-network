@@ -35,6 +35,7 @@ services:
         extra_hosts:
             - "peer0.org1.example.com:${HOST_A}"
             - "orderer0.example.com:${HOST_A}"
+            - "orderer4.example.com:${HOST_A}"
             - "ca.org1.example.com:${HOST_A}"
             - "peer0.org3.example.com:${HOST_C}"
             - "orderer2.example.com:${HOST_C}"
@@ -63,6 +64,7 @@ services:
         extra_hosts:
             - "peer0.org1.example.com:${HOST_A}"
             - "orderer0.example.com:${HOST_A}"
+            - "orderer4.example.com:${HOST_A}"
             - "ca.org1.example.com:${HOST_A}"
             - "peer0.org3.example.com:${HOST_C}"
             - "orderer2.example.com:${HOST_C}"
@@ -91,10 +93,11 @@ services:
             - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
             - FABRIC_CA_SERVER_CA_NAME=ca.org2.example.com
             - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org2.example.com-cert.pem
-            - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/59779c281c5da05157b80e32f82fa96ced21dee6d862fbb37bbe4426a8b126d2_sk
+            - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/73eb89c6cf2239c51c7c9617523dfe4a8c1e9ac614751058f0ec3ffd2fc19afe_sk
         extra_hosts:
             - "peer0.org1.example.com:${HOST_A}"
             - "orderer0.example.com:${HOST_A}"
+            - "orderer4.example.com:${HOST_A}"
             - "ca.org1.example.com:${HOST_A}"
             - "peer0.org3.example.com:${HOST_C}"
             - "orderer2.example.com:${HOST_C}"

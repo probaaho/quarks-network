@@ -2,6 +2,7 @@ version: "2"
 
 volumes:
   orderer0.example.com:
+  orderer4.example.com:
   peer0.org1.example.com:
 
 networks:
@@ -84,13 +85,46 @@ services:
         ports:
             - 7050:7050
 
+    orderer4.example.com:
+        extends:
+            file: docker-compose-base.yml
+            service: orderer
+        container_name: orderer4.example.com
+        environment:
+            - ORDERER_HOST=orderer4.example.com
+            - ORDERER_ABSOLUTEMAXBYTES=${ORDERER_ABSOLUTEMAXBYTES}
+            - ORDERER_PREFERREDMAXBYTES=${ORDERER_PREFERREDMAXBYTES}
+        extra_hosts:
+            - "peer0.org2.example.com:${HOST_B}"
+            - "orderer1.example.com:${HOST_B}"
+            - "ca.org2.example.com:${HOST_B}"
+            - "peer0.org3.example.com:${HOST_C}"
+            - "orderer2.example.com:${HOST_C}"
+            - "ca.org3.example.com:${HOST_C}"
+            - "peer0.org4.example.com:${HOST_D}"
+            - "orderer3.example.com:${HOST_D}"
+            - "ca.org4.example.com:${HOST_D}"
+
+        volumes:
+            - ../crypto-config/ordererOrganizations/example.com/orderers/orderer4.example.com/msp:/var/hyperledger/msp
+            - ../crypto-config/ordererOrganizations/example.com/orderers/orderer4.example.com/tls:/var/hyperledger/tls
+            - ../network-config/:/var/hyperledger/configs
+            - orderer4.example.com:/var/hyperledger/production/orderer
+
+        networks:
+            behave:
+                aliases:
+                    - ${CORE_PEER_NETWORKID}
+        ports:
+            - 8050:7050
+
     ca.org1.example.com:
         image: hyperledger/fabric-ca:1.4.9
         environment:
             - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
             - FABRIC_CA_SERVER_CA_NAME=ca.org1.example.com
             - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org1.example.com-cert.pem
-            - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/4ed48722d64ebb8f6d8ab4c2e38d76f9145b724f246950871d54bd4ccac0663e_sk
+            - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/6899e4182b14666e7d85bddac0c2f3c5df0cd5e3371f5465945c99571fa8de25_sk
         extra_hosts:
             - "peer0.org2.example.com:${HOST_B}"
             - "orderer1.example.com:${HOST_B}"
