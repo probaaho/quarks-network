@@ -8,7 +8,7 @@ quarks_four_ip=four.quarks.com
 project_path=~/quarks-network/node-poc
 project_docker_path=~/quarks-network/node-poc/deployment
 
-ssh_cmd='ssh -o StrictHostKeyChecking=no '
+ssh_cmd='ssh -o StrictHostKeyChecking=no -i pem/quarks-pk.pem'
 ssh_quarks_one="${ssh_cmd} user@${quarks_one_ip}"
 ssh_quarks_two="${ssh_cmd} user@${quarks_two_ip}"
 ssh_quarks_three="${ssh_cmd} user@${quarks_three_ip}"
