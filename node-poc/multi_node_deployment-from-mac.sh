@@ -1,6 +1,6 @@
 #!/bin/bash
 
-servers=("one.quarks.com" "two.quarks.com" "three.quarks.com")
+servers=("one.quarks.com" "two.quarks.com" "three.quarks.com", "four.quarks.com")
 
 quarks_one_ip=one.quarks.com
 quarks_two_ip=two.quarks.com
@@ -63,6 +63,8 @@ sync_project() {
 destroy_network
 sync_project
 
+sleep 10
+
 
 echo "################## Node Initiation in org1 org2 org3 org4 ####################################"
 
@@ -78,14 +80,11 @@ $ssh_quarks_two 'cd ~/quarks-network/node-poc/deployment && docker-compose -f do
 $ssh_quarks_three 'cd ~/quarks-network/node-poc/deployment && docker-compose -f docker-compose-org3cli.yml up -d'
 $ssh_quarks_four 'cd ~/quarks-network/node-poc/deployment && docker-compose -f docker-compose-org4cli.yml up -d'
 
-echo "DONE"
-sleep 10000
-
 echo "################# wait for 10 seconds #################################"
-sleep 10
+
 
 echo
-echo "################## Channel-123 Creation and Joining #######################################"
+echo "################## Channel Creation and Joining #######################################"
 # create channel-123 from peer0 on org1
 # it connects to orderer0
 docker exec cli1 peer channel create -o orderer0.example.com:7050 -c channel-1234 -f ./network-config/channel-1234.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer0.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
@@ -94,6 +93,16 @@ docker exec cli1 peer channel create -o orderer0.example.com:7050 -c channel-12 
 docker exec cli1 peer channel create -o orderer0.example.com:7050 -c channel-1 -f ./network-config/channel-1.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer0.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
 
 docker exec cli1 peer channel join -b channel-1234.block
+docker exec cli1 peer channel join -b channel-123.block
+docker exec cli1 peer channel join -b channel-12.block
+docker exec cli1 peer channel join -b channel-1.block
+
+sleep 10000
+
+
+docker exec -e CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp -e CORE_PEER_ADDRESS=peer0.org2.example.com:7051 -e CORE_PEER_LOCALMSPID="Org2MSP" -e CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt cli2 peer channel join -b channel-1234.block
+
+
 
 docker exec -e CORE_PEER_ADDRESS=peer0.org1.example.com:7051 -e CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt cli1 peer channel join -b channel-1234.block
 
