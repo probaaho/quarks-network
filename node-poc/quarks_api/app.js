@@ -399,12 +399,12 @@ async function getOrgConnection(org) {
 }
 
 
-appOrg1.listen(3001, "0.0.0.0");
-console.log('quarks api org1 running in port 3001');
+//appOrg1.listen(3001, "0.0.0.0");
+//console.log('quarks api org1 running in port 3001');
 
-appOrg2.listen(3002, "0.0.0.0");
-console.log('quarks api org2 running in port 3002');
+//appOrg2.listen(3002, "0.0.0.0");
+//console.log('quarks api org2 running in port 3002');
 
-appOrg3.listen(3003, "0.0.0.0");
-console.log('quarks api org3 running in port 3003');
+//appOrg3.listen(3003, "0.0.0.0");
+//console.log('quarks api org3 running in port 3003');
 
