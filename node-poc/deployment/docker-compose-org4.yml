@@ -49,8 +49,8 @@ services:
                 aliases:
                     - ${CORE_PEER_NETWORKID}
         ports:
-            - 9051:7051
-            - 9053:7053
+            - 7051:7051
+            - 7053:7053
 
     orderer3.example.com:
         extends:
@@ -83,7 +83,7 @@ services:
                 aliases:
                     - ${CORE_PEER_NETWORKID}
         ports:
-            - 9050:7050
+            - 7050:7050
 
     ca.org4.example.com:
         image: hyperledger/fabric-ca:1.4.9
@@ -104,7 +104,7 @@ services:
             - "orderer2.example.com:${HOST_C}"
             - "ca.org3.example.com:${HOST_C}"
         ports:
-            - "9054:7054"
+            - "7054:7054"
         command: sh -c 'fabric-ca-server start -b admin:adminpw'
         volumes:
             - ../crypto-config/peerOrganizations/org4.example.com/ca/:/etc/hyperledger/fabric-ca-server-config
