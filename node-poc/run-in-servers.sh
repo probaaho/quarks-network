@@ -1,22 +1,19 @@
 #!/bin/bash
 
-# List of servers with username and password
-servers=(
-  "one.quarks.com|user|user1234"
-  "two.quarks.com|user|user1234"
-  "three.quarks.com|user|user1234"
-  "four.quarks.com|user|user1234"
-)
+# List of servers
+servers=("one.quarks.com" "two.quarks.com" "three.quarks.com")
 
 # Command to run (provided as a parameter)
-command="$@"
+command="$1"
 
-# Function to execute the command on each server
-run_command() {
-  IFS='|' read -r hostname username password <<< "$1"
-  echo "Running command on $hostname:"
-  echo "$2" | sshpass -p "$password" ssh -o StrictHostKeyChecking=no "$username@$hostname"
-  echo "------------------------"
+# PEM key file path
+pem_key="pem/quarks-pk.pem"
+user=shuhan
+
+# Function to execute the command on each server in parallel
+run_command_parallel() {
+  local server="$1"
+  ssh -o StrictHostKeyChecking=no -i "$pem_key" "$user@$server" "$command"
 }
 
 # Check if the command is provided
@@ -26,5 +23,7 @@ if [ -z "$command" ]; then
 fi
 
 # Run the command on servers in parallel
-export -f run_command
-parallel -j 0 run_command ::: "${servers[@]}" ::: "$command"
+for server in "${servers[@]}"; do
+  run_command_parallel "$server" &
+done
+wait
