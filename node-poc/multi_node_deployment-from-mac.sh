@@ -1,6 +1,6 @@
 #!/bin/bash
 
-servers=("one.quarks.com" "two.quarks.com" "three.quarks.com", "four.quarks.com")
+servers=("one.quarks.com" "two.quarks.com" "three.quarks.com" "four.quarks.com")
 
 quarks_one_ip=one.quarks.com
 quarks_two_ip=two.quarks.com
@@ -87,82 +87,30 @@ echo
 echo "################## Channel Creation and Joining #######################################"
 # create channel-123 from peer0 on org1
 # it connects to orderer0
-docker exec cli1 peer channel create -o orderer0.example.com:7050 -c channel-1234 -f ./network-config/channel-1234.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer0.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
-docker exec cli1 peer channel create -o orderer0.example.com:7050 -c channel-123 -f ./network-config/channel-123.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer0.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
-docker exec cli1 peer channel create -o orderer0.example.com:7050 -c channel-12 -f ./network-config/channel-12.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer0.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
-docker exec cli1 peer channel create -o orderer0.example.com:7050 -c channel-1 -f ./network-config/channel-1.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer0.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
-
-docker exec cli1 peer channel join -b channel-1234.block
-docker exec cli1 peer channel join -b channel-123.block
-docker exec cli1 peer channel join -b channel-12.block
-docker exec cli1 peer channel join -b channel-1.block
-
-sleep 10000
+$ssh_quarks_one 'docker exec cli1 peer channel create -o orderer0.example.com:7050 -c channel-1234 -f ./network-config/channel-1234.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer0.example.com/msp/tlscacerts/tlsca.example.com-cert.pem'
+$ssh_quarks_one 'docker exec cli1 peer channel create -o orderer0.example.com:7050 -c channel-123 -f ./network-config/channel-123.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer0.example.com/msp/tlscacerts/tlsca.example.com-cert.pem'
+$ssh_quarks_one 'docker exec cli1 peer channel create -o orderer0.example.com:7050 -c channel-12 -f ./network-config/channel-12.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer0.example.com/msp/tlscacerts/tlsca.example.com-cert.pem'
+$ssh_quarks_one 'docker exec cli1 peer channel create -o orderer0.example.com:7050 -c channel-1 -f ./network-config/channel-1.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer0.example.com/msp/tlscacerts/tlsca.example.com-cert.pem'
 
 
-docker exec -e CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp -e CORE_PEER_ADDRESS=peer0.org2.example.com:7051 -e CORE_PEER_LOCALMSPID="Org2MSP" -e CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt cli2 peer channel join -b channel-1234.block
+$ssh_quarks_one 'docker exec cli1 peer channel join -b channel-1234.block'
+$ssh_quarks_one 'docker exec -e CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp -e CORE_PEER_ADDRESS=peer0.org2.example.com:7051 -e CORE_PEER_LOCALMSPID="Org2MSP" -e CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt cli1 peer channel join -b channel-1234.block'
+$ssh_quarks_one 'docker exec -e CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.example.com/users/Admin@org3.example.com/msp -e CORE_PEER_ADDRESS=peer0.org3.example.com:7051 -e CORE_PEER_LOCALMSPID="Org3MSP" -e CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls/ca.crt cli1 peer channel join -b channel-1234.block'
+$ssh_quarks_one 'docker exec -e CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org4.example.com/users/Admin@org4.example.com/msp -e CORE_PEER_ADDRESS=peer0.org4.example.com:7051 -e CORE_PEER_LOCALMSPID="Org4MSP" -e CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org4.example.com/peers/peer0.org4.example.com/tls/ca.crt cli1 peer channel join -b channel-1234.block'
 
+$ssh_quarks_one 'docker exec cli1 peer channel join -b channel-123.block'
+$ssh_quarks_one 'docker exec -e CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp -e CORE_PEER_ADDRESS=peer0.org2.example.com:7051 -e CORE_PEER_LOCALMSPID="Org2MSP" -e CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt cli1 peer channel join -b channel-123.block'
+$ssh_quarks_one 'docker exec -e CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.example.com/users/Admin@org3.example.com/msp -e CORE_PEER_ADDRESS=peer0.org3.example.com:7051 -e CORE_PEER_LOCALMSPID="Org3MSP" -e CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.example.com/peers/peer0.org3.example.com/tls/ca.crt cli1 peer channel join -b channel-123.block'
 
+$ssh_quarks_one 'docker exec cli1 peer channel join -b channel-12.block'
+$ssh_quarks_one 'docker exec -e CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/users/Admin@org2.example.com/msp -e CORE_PEER_ADDRESS=peer0.org2.example.com:7051 -e CORE_PEER_LOCALMSPID="Org2MSP" -e CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt cli1 peer channel join -b channel-12.block'
 
-docker exec -e CORE_PEER_ADDRESS=peer0.org1.example.com:7051 -e CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt cli1 peer channel join -b channel-1234.block
+$ssh_quarks_one 'docker exec cli1 peer channel join -b channel-1.block'
 
-$ssh_quarks_one 'docker exec -e "CORE_PEER_LOCALMSPID=Org1MSP" -e "CORE_PEER_MSPCONFIGPATH=/var/hyperledger/users/Admin@org1.example.com/msp" peer0.org1.example.com peer channel create -o orderer0.example.com:7050 -c channel-123 -f /var/hyperledger/configs/channel-123.tx'
-# join peer0 to channel
-$ssh_quarks_one 'docker exec -e "CORE_PEER_LOCALMSPID=Org1MSP" -e "CORE_PEER_MSPCONFIGPATH=/var/hyperledger/users/Admin@org1.example.com/msp" peer0.org1.example.com peer channel join -b channel-123.block'
-
-echo
-echo "################## Channel-23 Creation and Joining #######################################"
-# create channel-23 from peer0 on org2
-# it connects to orderer0
-$ssh_quarks_two 'docker exec -e "CORE_PEER_LOCALMSPID=Org2MSP" -e "CORE_PEER_MSPCONFIGPATH=/var/hyperledger/users/Admin@org2.example.com/msp" peer0.org2.example.com peer channel create -o orderer1.example.com:7050 -c channel-23 -f /var/hyperledger/configs/channel-23.tx'
-# join peer0 to channel
-$ssh_quarks_two 'docker exec -e "CORE_PEER_LOCALMSPID=Org2MSP" -e "CORE_PEER_MSPCONFIGPATH=/var/hyperledger/users/Admin@org2.example.com/msp" peer0.org2.example.com peer channel join -b channel-23.block'
-
-echo
-echo "################## Channel-1 Creation and Joining #######################################"
-# create channel-1 from peer0 on org1
-# it connects to orderer0
-$ssh_quarks_one 'docker exec -e "CORE_PEER_LOCALMSPID=Org1MSP" -e "CORE_PEER_MSPCONFIGPATH=/var/hyperledger/users/Admin@org1.example.com/msp" peer0.org1.example.com peer channel create -o orderer0.example.com:7050 -c channel-1 -f /var/hyperledger/configs/channel-1.tx'
-# join peer0 to channel
-$ssh_quarks_one 'docker exec -e "CORE_PEER_LOCALMSPID=Org1MSP" -e "CORE_PEER_MSPCONFIGPATH=/var/hyperledger/users/Admin@org1.example.com/msp" peer0.org1.example.com peer channel join -b channel-1.block'
-
-echo
-echo "################## Channel Block Sharing #############################################"
-echo "block copy"
-$ssh_quarks_one 'docker cp peer0.org1.example.com:/channel-123.block .'
-$ssh_quarks_two 'docker cp peer0.org2.example.com:/channel-23.block .'
-
-echo "block copy to other host"
-$ssh_quarks_one "$scp_cmd -r channel-123.block quarks@$quarks_two_ip:~/"
-
-echo "block set to peers"
-$ssh_quarks_two 'docker cp channel-123.block peer0.org2.example.com:/channel-123.block'
-$ssh_quarks_two 'docker cp channel-123.block peer0.org3.example.com:/channel-123.block'
-
-$ssh_quarks_two 'docker cp channel-23.block peer0.org3.example.com:/channel-23.block'
-
-echo "removing blocks"
-$ssh_quarks_one 'rm channel-123.block'
-
-$ssh_quarks_two 'rm channel-123.block'
-$ssh_quarks_two 'rm channel-23.block'
-
-echo
-echo "#############################channel join of peers####################"
-$ssh_quarks_two 'docker exec -e "CORE_PEER_LOCALMSPID=Org2MSP" -e "CORE_PEER_MSPCONFIGPATH=/var/hyperledger/users/Admin@org2.example.com/msp" peer0.org2.example.com peer channel join -b channel-123.block'
-$ssh_quarks_two 'docker exec -e "CORE_PEER_LOCALMSPID=Org3MSP" -e "CORE_PEER_MSPCONFIGPATH=/var/hyperledger/users/Admin@org3.example.com/msp" peer0.org3.example.com peer channel join -b channel-123.block'
-$ssh_quarks_two 'docker exec -e "CORE_PEER_LOCALMSPID=Org3MSP" -e "CORE_PEER_MSPCONFIGPATH=/var/hyperledger/users/Admin@org3.example.com/msp" peer0.org3.example.com peer channel join -b channel-23.block'
-
-docker exec cli1 peer chaincode instantiate -o orderer0.example.com:7050 --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer0.example.com/msp/tlscacerts/tlsca.example.com-cert.pem -C channel-1 -n mycc github.com/chaincode -v v0 -c '{"Args": ["initLedger"]}'
-docker exec cli1 peer chaincode invoke -o orderer0.example.com:7050 --tls true --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer0.example.com/msp/tlscacerts/tlsca.example.com-cert.pem -C channel-1 -n mycc --peerAddresses peer0.org1.example.com:7051 --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt -c '{"Args":["addMessage", "Hello"]}'
 
 ./chaincode_deploy.sh mycc 0 init
 
-#
-#echo
-#echo "############################# Ledger Init ###########################"
-#curl --location --request POST 'beta.alphaid.com:3000/initLedger/' \
-#--data-raw ''
+echo "############# Chaincode Deployed ###########################"
 
 echo
 echo "%%%%%%%%% congratulations %%%%%%%%%%%%"
