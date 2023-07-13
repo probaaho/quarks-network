@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
 	"os/exec"
 	"sort"
 	"sync"
@@ -9,7 +11,7 @@ import (
 )
 
 // Function to load test
-func loadTestFunction(iteration int, wg *sync.WaitGroup, elapsedTimes chan<- time.Duration) {
+func loadTestFunction(iteration int, wg *sync.WaitGroup, elapsedTimes chan<- time.Duration, command string) {
 	defer wg.Done()
 
 	fmt.Printf("Running iteration %d\n", iteration)
@@ -19,7 +21,9 @@ func loadTestFunction(iteration int, wg *sync.WaitGroup, elapsedTimes chan<- tim
 
 	// the load
 
-	runCommand("sleep 1")
+	out, err := runCommand(command)
+	fmt.Println(out)
+	fmt.Println(err)
 
 	//
 	elapsedTime := time.Since(startTime)
@@ -37,6 +41,15 @@ func runCommand(command string) ([]byte, error) {
 	return output, nil
 }
 
+// Function to read a string from a .txt file
+func readStringFromFile(filename string) (string, error) {
+	content, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return "", err
+	}
+	return string(content), nil
+}
+
 func main() {
 	// Number of concurrent iterations
 	concurrency := 10
@@ -50,9 +63,17 @@ func main() {
 
 	fmt.Println("Starting load testing")
 
+	filepath := "cmd.txt"
+
+	// Read the string from the file
+	command, err := readStringFromFile(filepath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// Run iterations in parallel
 	for i := 1; i <= concurrency; i++ {
-		go loadTestFunction(i, &wg, elapsedTimes)
+		go loadTestFunction(i, &wg, elapsedTimes, command)
 	}
 
 	// Wait for all iterations to complete
